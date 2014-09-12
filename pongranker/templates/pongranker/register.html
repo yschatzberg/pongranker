@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+     <title>My First Bootstrap Project</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+</head>
+  <body>
+    <div class="container">
+        <!-- Nav Bar -->
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/pongranker/">Sift Pong</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                <li><a href="/pongranker/ranking/">Rankings</a></li>
+                <li><a href="/pongranker/players">Players</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <form class="navbar-form navbar-right" action="/pongranker/login/">
+                    <a href="/pongranker/register/">Sign Up</a>
+                   <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+              </ul>
+            </div><!-- /.navbar-collapse -->
+          </div><!-- /.container-fluid -->
+        </nav>
+
+
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-4 col-md-8 col-md-offset-4 col-sm-8 col-sm-offset-4">
+                <form name="user_form" action="/pongranker/register/" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <label for="inputEmail">Email</label>
+                                <input type="email" class="form-control" id="inputEmail" required="required"
+                                       name="email" placeholder="Required">
+                            </div>
+                            {% if integrity_error %}
+                                    <span class="help-inline" style="color:red">This email is already taken</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <label for="inputPassword">Password</label>
+                                <input type="password" class="form-control" id="inputPassword" required="required"
+                                       name="password" placeholder="Password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <label for="inputFirst">First Name</label>
+                                <input class="form-control" id="inputFirst"
+                                       name="first_name" placeholder="ex. Arzav">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <label for="inputlast">Last Name</label>
+                                <input class="form-control" id="inputlast"
+                                       name="last_name" placeholder="ex. Jain">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    <a href="/pongranker/login/">or Login</a>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+  </body>
+</html>

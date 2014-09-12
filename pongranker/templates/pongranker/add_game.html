@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+     <title>SiftPong Homepage</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+</head>
+  <body>
+    <div class="container">
+        <!-- Nav Bar -->
+        <nav class="navbar navbar-default" role="navigation">
+          <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="/pongranker/">Sift Pong</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                <li><a href="/pongranker/ranking/">Rankings</a></li>
+                <li><a href="/pongranker/players">Players</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                    <form class="navbar-form navbar-right" action="/pongranker/add_game/">
+                        <a href="/pongranker/logout/">logout</a>
+                       <button type="submit" class="btn btn-primary active">Add Game</button>
+                    </form>
+                {% else %}
+                    <form class="navbar-form navbar-right" action="/pongranker/login/">
+                        <a href="/pongranker/register/">Sign Up</a>
+                       <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                {% endif %}
+              </ul>
+            </div><!-- /.navbar-collapse -->
+          </div><!-- /.container-fluid -->
+        </nav>
+
+        <div class="row">
+            <form name="add_game_form" action="/pongranker/add_game/" method="post">
+                    {% csrf_token %}
+                    {% if error_msg %}
+                        <h1 style="text-align: center">{{ error_msg }}</h1>
+                    {% endif %}
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="jumbotron">
+                        <h2 style="text-align: center">Player 1</h2>
+                        <div class="input-group">
+                           <div class="input-group-btn">
+                              <button type="button" class="btn btn-default
+                                 dropdown-toggle" data-toggle="dropdown" >
+                                 Choose Player
+                                 <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" id="player1drop">
+                              </ul>
+                           </div><!-- /btn-group -->
+                           <input class="span2" id="player_1" name="player_1" type="hidden" required="required">
+                           <input type="text" class="form-control" name="score_1" placeholder="Score" required="required">
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="jumbotron">
+                        <h2 style="text-align: center">Player 2</h2>
+                        <div class="input-group">
+                           <div class="input-group-btn">
+                              <button type="button" class="btn btn-default
+                                 dropdown-toggle" data-toggle="dropdown" name="player_3">
+                                 Choose Player
+                                 <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" id="player3drop">
+                              </ul>
+                           </div><!-- /btn-group -->
+                           <input class="span2" id="player_3" name="player_3" type="hidden">
+                           <input type="text" class="form-control" name="score_2" placeholder="Score" required="required">
+                        </div><!-- /input-group -->
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Game</button>
+
+            </form>
+
+        </div>
+
+
+
+
+
+    </div>
+
+
+
+
+<!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script>
+        var player_1_list = document.getElementById('player1drop');
+        var player_2_list = document.getElementById('player3drop');
+        var emailList = new Array();
+        window.onload = function(){
+           $.getJSON('http://localhost:8000/pongranker/player_emails_and_names', { }, function(data) {
+                $.each(data, function(index, element) {
+                    var liEntry = document.createElement('li');
+                    liEntry.role += "presentation";
+                    liEntry.appendChild(document.createTextNode(element));
+                    player_1_list.appendChild(liEntry);
+
+                    var liEntry2 = document.createElement('li');
+                    liEntry2.role += "presentation";
+                    liEntry2.appendChild(document.createTextNode(element));
+                    player_2_list.appendChild(liEntry2);
+                    emailList[element] = index;
+                });
+        });};
+
+        $(document).ready(function() {
+
+            $('ul').on('click','li', function (evt) {
+                console.log(this);
+                console.log(evt);
+                console.log(evt.currentTarget.parentNode.id);
+                // set the proper input
+                if(evt.currentTarget.parentNode.id == "player1drop") {
+                    $("#player_1").val(emailList[$(this).text()]);
+                }
+                // player 3 is "player 2" because in teams, p1 and p2 are same team.
+                else {
+                    $("#player_3").val(emailList[$(this).text()]);
+                }
+                $(this).closest('.input-group-btn').children('button').text($(this).text());
+
+            });
+       });
+
+
+
+    </script>
+
+
+  </body>
+</html>
