@@ -23,23 +23,23 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="/pongranker/">Sift Pong</a>
+              <a class="navbar-brand" href="/">Sift Pong</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav">
-                <li><a href="/pongranker/ranking/">Rankings</a></li>
-                <li><a href="/pongranker/players">Players</a></li>
+                <li><a href="/ranking/">Rankings</a></li>
+                <li><a href="/players">Players</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                    <form class="navbar-form navbar-right" action="/pongranker/add_game/">
-                        <a href="/pongranker/logout/">logout</a>
+                    <form class="navbar-form navbar-right" action="/add_game/">
+                        <a href="/logout/">logout</a>
                        <button type="submit" class="btn btn-primary active">Add Game</button>
                     </form>
                 {% else %}
-                    <form class="navbar-form navbar-right" action="/pongranker/login/">
-                        <a href="/pongranker/register/">Sign Up</a>
+                    <form class="navbar-form navbar-right" action="/login/">
+                        <a href="/register/">Sign Up</a>
                        <button type="submit" class="btn btn-primary">Login</button>
                     </form>
                 {% endif %}
@@ -49,7 +49,7 @@
         </nav>
 
         <div class="row">
-            <form name="add_game_form" action="/pongranker/add_game/" method="post">
+            <form name="add_game_form" action="/add_game/" method="post">
                     {% csrf_token %}
                     {% if error_msg %}
                         <h1 style="text-align: center">{{ error_msg }}</h1>
@@ -113,7 +113,7 @@
         var player_2_list = document.getElementById('player3drop');
         var emailList = new Array();
         window.onload = function(){
-           $.getJSON('http://localhost:8000/pongranker/player_emails_and_names', { }, function(data) {
+           $.getJSON('http://localhost:8000/player_emails_and_names', { }, function(data) {
                 $.each(data, function(index, element) {
                     var liEntry = document.createElement('li');
                     liEntry.role += "presentation";
