@@ -107,7 +107,7 @@ def add_game(request):
 
       return render_to_response(
             'pongranker/add_game.html',
-            {'post_game_add', game_added},
+            {'post_game_add': game_added},
             context)
     else:
       player_list = User.objects.order_by('first_name', 'last_name')
@@ -116,6 +116,7 @@ def add_game(request):
             'pongranker/add_game.html',
             {'player_list': player_list},
             context)
+
 def register(request):
     # Like before, get the request's context.
     context = RequestContext(request)
