@@ -45,8 +45,9 @@ def player_detail(request, player_uname):
     except User.DoesNotExist:
       raise Http404
 
+    # TODO: change this
     return render_to_response(
-            'pongranker/player_page.html',
+            'pongranker/404.html',
             {'player': player},
             context)
 
