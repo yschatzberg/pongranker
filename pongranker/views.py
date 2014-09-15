@@ -95,10 +95,15 @@ def add_game(request):
         new_ratings = rate_1vs1(player_1.elo_singles_ranking, player_3.elo_singles_ranking)
         player_1.elo_singles_ranking = round(new_ratings[0])
         player_3.elo_singles_ranking = round(new_ratings[1])
+        player_1.total_singles_wins += 1
+        player_3.total_singles_losses += 1
+
       else:
         new_ratings = rate_1vs1(player_3.elo_singles_ranking, player_1.elo_singles_ranking)
         player_3.elo_singles_ranking = round(new_ratings[0])
         player_1.elo_singles_ranking = round(new_ratings[1])
+        player_3.total_singles_wins += 1
+        player_1.total_singles_losses += 1
 
       player_1.save()
       player_3.save()
