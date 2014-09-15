@@ -11,7 +11,7 @@ gunicorn==19.0.0
 httplib2==0.9
 mock==1.0.1
 oauth2==1.5.211
-psycopg2==2.5.3
+psycopg2==2.5.4
 python-openid==2.2.5
 requests==2.3.0
 static3==0.5.1
