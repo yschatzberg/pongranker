@@ -13,7 +13,7 @@ from pongranker.models import Player, Game
 from django.contrib.auth.models import User
 
 def home(request):
-    player_list = Player.objects.order_by('-elo_singles_ranking')[:3]
+    player_list = Player.objects.order_by('-elo_singles_ranking')
     template = loader.get_template('pongranker/index.html')
     context = RequestContext(request, {
         'player_list': player_list,
@@ -29,9 +29,9 @@ def players(request):
     })
     return HttpResponse(template.render(context))
 
-def rankings(request):
-    player_list = Player.objects.order_by('-elo_singles_ranking')
-    template = loader.get_template('pongranker/rankings.html')
+def leaderboard(request):
+    player_list = Player.objects.order_by('-elo_singles_ranking')[:3]
+    template = loader.get_template('pongranker/leaderboard.html')
     context = RequestContext(request, {
         'player_list': player_list,
     })
