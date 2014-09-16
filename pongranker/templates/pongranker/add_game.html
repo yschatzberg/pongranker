@@ -32,7 +32,7 @@
                 <li><a href="/players">Players</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and not user.is_superuser %}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.first_name }} {{ user.last_name }} <span class="caret"></span></a>
                       <ul class="dropdown-menu" role="menu">
@@ -125,15 +125,18 @@
         window.onload = function(){
            $.getJSON('/player_emails_and_names', { }, function(data) {
                 $.each(data, function(index, element) {
-                    var liEntry = document.createElement('li');
-                    liEntry.role += "presentation";
-                    liEntry.appendChild(document.createTextNode(element));
-                    player_1_list.appendChild(liEntry);
+                    var link1 = document.createElement('a');
+                    link1.appendChild(document.createTextNode(element));
+                    var liEntry1 = document.createElement('li');
+                    liEntry1.appendChild(link1);
+                    player_1_list.appendChild(liEntry1);
 
+                    var link2 = document.createElement('a');
+                    link2.appendChild(document.createTextNode(element));
                     var liEntry2 = document.createElement('li');
-                    liEntry2.role += "presentation";
-                    liEntry2.appendChild(document.createTextNode(element));
+                    liEntry2.appendChild(link2);
                     player_2_list.appendChild(liEntry2);
+
                     emailList[element] = index;
                 });
         });};
