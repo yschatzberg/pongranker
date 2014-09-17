@@ -59,14 +59,18 @@ def add_game(request):
       # check that we have some necessary stuff
 
       error_msg = ""
+      score_1 = int(request.POST['score_1'])
+      score_2 = int(request.POST['score_2'])
+
       if 'player_1' not in request.POST or not request.POST['player_1']:
         error_msg = "Player 1 not given"
       elif 'player_3' not in request.POST or not request.POST['player_3']:
         error_msg = "Player 2 not given"
+      elif score_1 < 0 or score_1 < 0:
+        error_msg = "Score may not be negative"
 
 
       if error_msg:
-        raise KeyError
         return render_to_response(
               'pongranker/add_game.html',
               {'error_msg': error_msg},
@@ -207,13 +211,5 @@ def unknown(request):
     raise Http404
 # Create your views here.
 
-def get_player_emails_and_names(request):
-    player_list = User.objects.order_by('first_name', 'last_name')
 
-    response = {}
-    for player in player_list:
-      if not player.is_superuser:
-        response[player.email] = player.first_name + " " + player.last_name
-
-    return HttpResponse(json.dumps(response), content_type="application/json")
 
