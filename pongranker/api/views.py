@@ -26,7 +26,7 @@ def get_games(request):
 
 
 
-    game_list = Game.objects.all()[:max_games]
+    game_list = Game.objects.order_by("-game_date")[:max_games]
 
     response = []
     for game in game_list:

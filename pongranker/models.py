@@ -14,7 +14,7 @@ class Game(models.Model):
 
     score_2    = models.IntegerField()
 
-    game_date  = models.DateField(default=datetime.date.today())
+    game_date  = models.DateField(auto_now_add=True, editable=False)
 
     def __unicode__(self):
         return "\nPlayer 1: " + self.player_1 + \
