@@ -41,9 +41,6 @@
                         <li><a href="/logout/">Logout</a></li>
                       </ul>
                     </li>
-                    <form class="navbar-form navbar-right" action="/add_game/">
-                       <button type="submit" class="btn btn-primary">Add Game</button>
-                    </form>
                 {% else %}
                     <form class="navbar-form navbar-right" action="/login/">
                         <a href="/register/">Sign Up</a>
@@ -100,7 +97,9 @@
                         </div><!-- /input-group -->
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Game</button>
+                <div class="col-lg-2 col-lg-offset-5" style="text-align: center">
+                <button type="submit" class="btn btn-primary">Submit Game</button>
+                </div>
 
             </form>
 

@@ -81,8 +81,8 @@ def add_game(request):
       p3_email = request.POST['player_3']
       player_1 = Player.objects.get(user=User.objects.get(username=p1_email))
       player_3 = Player.objects.get(user=User.objects.get(username=p3_email))
-      player_1_name  = player_1.user.first_name + player_1.user.last_name
-      player_3_name  = player_3.user.first_name + player_3.user.last_name
+      player_1_name  = player_1.user.first_name + " " + player_1.user.last_name[0]
+      player_3_name  = player_3.user.first_name + " " + player_3.user.last_name[0]
 
       game = Game(player_1=player_1_name,
                   player_2=player_3_name,

@@ -1,8 +1,5 @@
 __author__ = 'yoavschatzberg'
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, redirect
-from django.db import IntegrityError
-from django.template import RequestContext, loader
 
 import json
 from pongranker.models import Player, Game
@@ -18,3 +15,28 @@ def get_player_emails_and_names(request):
         response[player.email] = player.first_name + " " + player.last_name
 
     return HttpResponse(json.dumps(response), content_type="application/json")
+
+# currently gets 5 games.
+def get_games(request):
+
+    max_games = 5
+    param = request.GET.get('max_games')
+    if param:
+      max_games = int(max_games)
+
+
+
+    game_list = Game.objects.all()[:max_games]
+
+    response = []
+    for game in game_list:
+      game_json = {}
+      game_json[u'player_1'] = game.player_1
+      game_json[u'score_1'] =  game.score_1
+
+      game_json[u'player_2'] = game.player_2
+      game_json[u'score_2'] = game.score_2
+      game_json[u'game_date'] = str(game.game_date)
+      response.append(game_json)
+    return HttpResponse(json.dumps(response), content_type="application/json")
+

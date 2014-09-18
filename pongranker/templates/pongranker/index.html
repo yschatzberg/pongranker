@@ -9,6 +9,13 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
+    <style>
+        .bold { font-weight: bold; }
+        .loss { color: #CC0000; }
+        .win { color: #009933; }
+        .winscore { left: 2px; }
+    </style>
+
 </head>
   <body>
     <div class="container">
@@ -41,9 +48,6 @@
                         <li><a href="/logout/">Logout</a></li>
                       </ul>
                     </li>
-                    <form class="navbar-form navbar-right" action="/add_game/">
-                       <button type="submit" class="btn btn-primary">Add Game</button>
-                    </form>
                 {% else %}
                     <form class="navbar-form navbar-right" action="/login/">
                         <a href="/register/">Sign Up</a>
@@ -58,7 +62,7 @@
 
         <!-- Player Rankings Panel -->
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
+            <div class="col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <h3 class="panel-title text-center">Singles Rankings</h3>
@@ -78,6 +82,20 @@
                   {% endif %}
                 </div>
             </div>
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title text-center">Recent Games</h3>
+                  </div>
+                      <div class="panel-body">
+                        <ul class="list-group" id="game_list">
+                            <form class="navbar-form navbar-right" action="/add_game/">
+                               <button type="submit" class="btn btn-primary">Add Game</button>
+                            </form>
+                        </ul>
+                      </div>
+                </div>
+            </div>
         </div>
 
 
@@ -88,5 +106,96 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+    <script>
+        window.onload = function(){
+            //populate games list
+           $.getJSON('../api/games', { max_games : 5 }, function(data) {
+                $.each(data, function(index, element) {
+                    //element is teh game json
+                    console.log(element);
+                    var li = document.createElement('li');
+                    li.className = "list-group-item";
+
+                    var date_span = document.createElement('span');
+                    date_span.className = "bold pull-right";
+                    date_span.appendChild(document.createTextNode(element['game_date']));
+                    li.appendChild(date_span);
+
+                    var row_div = document.createElement('div');
+                    row_div.className = "row";
+
+
+                    // Add Player 1
+                    var p1_div = document.createElement('div');
+                    p1_div.className = "col-lg-3";
+
+                    var p1_par = document.createElement('p');
+                    p1_par.style.textAlign="center";
+
+                    var p1_span = document.createElement('span');
+                    p1_span.appendChild(document.createTextNode(element['player_1']));
+
+
+                    p1_par.appendChild(p1_span);
+                    //add br here.
+                    var brk =document.createElement('br');
+                    p1_par.appendChild(brk);
+                    p1_par.appendChild(document.createTextNode(element['score_1']));
+
+                    p1_div.appendChild(p1_par);
+
+                    row_div.appendChild(p1_div);
+
+
+                    //add vs.
+                    var vs_div = document.createElement('div');
+                    vs_div.className = 'col-lg-1';
+
+                    var vs_par = document.createElement('p');
+                    vs_par.appendChild(document.createTextNode("vs."));
+
+                    vs_div.appendChild(vs_par);
+
+                    row_div.appendChild(vs_div);
+
+
+                    // Add player 2
+                    var p2_div = document.createElement('div');
+                    p2_div.className = "col-lg-3";
+
+                    var p2_par = document.createElement('p');
+                    p2_par.style.textAlign="center";
+
+                    var p2_span = document.createElement('span');
+                    p2_span.className = "bold";
+                    p2_span.appendChild(document.createTextNode(element['player_2']));
+
+                    p2_par.appendChild(p2_span);
+
+                    //add br here.
+                    var brk =document.createElement('br');
+                    p2_par.appendChild(brk);
+                    p2_par.appendChild(document.createTextNode(element['score_2']));
+
+                    p2_div.appendChild(p2_par);
+
+                    row_div.appendChild(p2_div);
+
+                    if (element['score_1'] > element['score_2']) {
+                        p1_span.className = "bold win";
+                        p2_span.className = "bold loss";
+                    }
+                    else {
+                        p1_span.className = "bold loss";
+                        p2_span.className = "bold win";
+                    }
+
+                    li.appendChild(row_div);
+
+                    list = document.getElementById('game_list');
+                    list.insertBefore(li, list.firstChild);
+                });
+           });};
+    </script>
   </body>
 </html>
