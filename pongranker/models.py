@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import datetime
 
 class Game(models.Model):
 
@@ -14,6 +14,15 @@ class Game(models.Model):
 
     score_2    = models.IntegerField()
 
+    game_date  = models.DateField(default=datetime.date.today())
+
+    def __unicode__(self):
+        return "\nPlayer 1: " + self.player_1 + \
+                "\nPlayer 2: " + self.player_2 + \
+                "\nScore 1: " + str(self.score_1) + \
+                "\nScore 2: " + str(self.score_2) + \
+                "\nGame Date: " + str(self.game_date) + \
+               "\n"
 
 # A single player
 class Player(models.Model):
