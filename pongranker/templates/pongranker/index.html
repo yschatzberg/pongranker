@@ -114,7 +114,7 @@
     <script>
         window.onload = function(){
             //populate games list
-           $.getJSON('../api/games', { max_games : 5 }, function(data) {
+           $.getJSON('../api/games', {max_games:5}, function(data) {
                 $.each(data, function(index, element) {
                     //element is teh game json
                     console.log(element);
