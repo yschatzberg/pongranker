@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-import datetime
-
+import time
 class Game(models.Model):
 
     # first player, alphabetically.  i.e. arzav jain before yoav schatzberg
@@ -23,6 +22,22 @@ class Game(models.Model):
                 "\nScore 2: " + str(self.score_2) + \
                 "\nGame Date: " + str(self.game_date) + \
                "\n"
+class MatchGame(models.Model):
+      # score for player 1 in the Match
+      score_1    = models.IntegerField()
+      #score for player 2 in the Match
+      score_2    = models.IntegerField()
+
+class Match(models.Model):
+    # first player, alphabetically.  i.e. arzav jain before yoav schatzberg
+    # this is constructed by concatenating user.first_name user.last_name[0] with a space
+    player_1 = models.CharField(max_length=100)
+
+    player_2 = models.CharField(max_length=100)
+
+    games = models.ManyToManyField(MatchGame)
+
+    timestamp = models.BigIntegerField(default=int(round(time.time())))
 
 # A single player
 class Player(models.Model):
