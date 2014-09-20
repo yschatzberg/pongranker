@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import time
+import datetime
 class Game(models.Model):
 
     # first player, alphabetically.  i.e. arzav jain before yoav schatzberg
@@ -23,10 +24,14 @@ class Game(models.Model):
                 "\nGame Date: " + str(self.game_date) + \
                "\n"
 class MatchGame(models.Model):
-      # score for player 1 in the Match
-      score_1    = models.IntegerField()
-      #score for player 2 in the Match
-      score_2    = models.IntegerField()
+    # score for player 1 in the Match
+    score_1    = models.IntegerField()
+    #score for player 2 in the Match
+    score_2    = models.IntegerField()
+
+    def __unicode__(self):
+      return "\nTeam 1 Score: " + str(self.score_1) + \
+              "\nTeam 2 Score: " + str(self.score_2)
 
 class Match(models.Model):
     # first player, alphabetically.  i.e. arzav jain before yoav schatzberg
@@ -41,6 +46,18 @@ class Match(models.Model):
     games = models.ManyToManyField(MatchGame)
 
     timestamp = models.BigIntegerField(default=int(round(time.time())))
+
+    def __unicode__(self):
+        output =  "\nTeam 1: " + self.player_1 + \
+                "\nTeam 2: " + self.player_2 + \
+                "\nMatch Date: " + datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d')
+        i = 1
+        for game in self.games.all():
+          output += "\nGame " + str(i) + game.__unicode__()
+          i = i+1
+
+        return output
+
 
 # A single player
 class Player(models.Model):
