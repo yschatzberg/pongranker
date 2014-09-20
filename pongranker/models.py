@@ -50,6 +50,8 @@ class Match(models.Model):
     def __unicode__(self):
         output =  "\nTeam 1: " + self.player_1 + \
                 "\nTeam 2: " + self.player_2 + \
+                "\nTeam 1 Wins: " + str(self.p1_wins) + \
+                "\nTeam 2 Wins: " + str(self.p2_wins) + \
                 "\nMatch Date: " + datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d')
         i = 1
         for game in self.games.all():
