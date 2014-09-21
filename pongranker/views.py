@@ -5,11 +5,12 @@ from django.db import IntegrityError
 from django.template import RequestContext, loader
 from django.contrib.auth import authenticate, login, logout
 from elo import rate_1vs1
+import time
 
 import json
 
 
-from pongranker.models import Player, Game
+from pongranker.models import Player, Game, Match, MatchGame
 from django.contrib.auth.models import User
 
 def home(request):
@@ -59,15 +60,26 @@ def add_game(request):
       # check that we have some necessary stuff
 
       error_msg = ""
-      score_1 = int(request.POST['score_1'])
-      score_2 = int(request.POST['score_2'])
+      player_1_scores = []
+      player_3_scores = []
+
+      player_1_scores.append(int(request.POST['score_1_1']))
+      player_3_scores.append(int(request.POST['score_2_1']))
+
+
 
       if 'player_1' not in request.POST or not request.POST['player_1']:
         error_msg = "Player 1 not given"
       elif 'player_3' not in request.POST or not request.POST['player_3']:
         error_msg = "Player 2 not given"
-      elif score_1 < 0 or score_1 < 0:
-        error_msg = "Score may not be negative"
+
+
+      for score in player_1_scores:
+        if score < 0:
+          error_msg = "Score may not be negative"
+      for score in player_3_scores:
+        if score < 0:
+          error_msg = "Score may not be negative"
 
 
       if error_msg:
@@ -86,41 +98,68 @@ def add_game(request):
       player_1_full_name  = (player_1.user.first_name + " " + player_1.user.last_name).lower()
       player_3_full_name  = (player_3.user.first_name + " " + player_3.user.last_name).lower()
 
+      score_list = []
+
       if player_1_full_name <= player_3_full_name:
         player_1_name  = player_1.user.first_name + " " + player_1.user.last_name[0]
         player_3_name  = player_3.user.first_name + " " + player_3.user.last_name[0]
-        score_1 = request.POST['score_1']
-        score_2 = request.POST['score_2']
+        i = 0
+        for score1 in player_1_scores:
+          score_list.append((score1, player_3_scores[i]))
+          i = i+1
+
       else:
         player_3_name  = player_1.user.first_name + " " + player_1.user.last_name[0]
         player_1_name  = player_3.user.first_name + " " + player_3.user.last_name[0]
-        score_2 = request.POST['score_1']
-        score_1 = request.POST['score_2']
 
-      game = Game(player_1=player_1_name,
-                  player_2=player_3_name,
-                  score_1=score_1,
-                  score_2=score_2)
+        i = 0
+        for score in player_3_scores:
+          score_list.append((score, player_1_scores[i]))
+          i = i+1
 
-      game.full_clean()
-      game.save()
+      match = Match(player_1=player_1_name, player_2=player_3_name)
+      match.timestamp = time.time()
+      game_list = []
+      for score in score_list:
+        game = MatchGame(score_1=score[0],
+                       score_2=score[1])
 
-      player_1.games.add(game)
-      player_3.games.add(game)
+        game.full_clean()
+        game.save()
+        game_list.append(game)
 
-      if game.score_1 > game.score_2:
-        new_ratings = rate_1vs1(player_1.elo_singles_ranking, player_3.elo_singles_ranking)
-        player_1.elo_singles_ranking = round(new_ratings[0])
-        player_3.elo_singles_ranking = round(new_ratings[1])
-        player_1.total_singles_wins += 1
-        player_3.total_singles_losses += 1
+        old_ratings = (player_1.elo_singles_ranking, player_3.elo_singles_ranking)
 
-      else:
-        new_ratings = rate_1vs1(player_3.elo_singles_ranking, player_1.elo_singles_ranking)
-        player_3.elo_singles_ranking = round(new_ratings[0])
-        player_1.elo_singles_ranking = round(new_ratings[1])
-        player_3.total_singles_wins += 1
-        player_1.total_singles_losses += 1
+        if game.score_1 > game.score_2:
+          new_ratings = rate_1vs1(player_1.elo_singles_ranking, player_3.elo_singles_ranking)
+          player_1.elo_singles_ranking = round(new_ratings[0])
+          player_3.elo_singles_ranking = round(new_ratings[1])
+          player_1.total_singles_wins += 1
+          player_3.total_singles_losses += 1
+          match.p1_wins += 1
+          match.p1_point_change = player_1.elo_singles_ranking - old_ratings[0]
+          match.p2_point_change = player_3.elo_singles_ranking - old_ratings[1]
+        else:
+          new_ratings = rate_1vs1(player_3.elo_singles_ranking, player_1.elo_singles_ranking)
+          player_3.elo_singles_ranking = round(new_ratings[0])
+          player_1.elo_singles_ranking = round(new_ratings[1])
+          player_3.total_singles_wins += 1
+          player_1.total_singles_losses += 1
+          match.p2_wins += 1
+          match.p1_point_change = player_1.elo_singles_ranking - old_ratings[1]
+          match.p2_point_change = player_3.elo_singles_ranking - old_ratings[0]
+
+
+      match.full_clean()
+      match.save()
+
+      for g in game_list:
+        match.games.add(g)
+
+      match.save()
+
+      player_1.matches.add(match)
+      player_3.matches.add(match)
 
       player_1.save()
       player_3.save()

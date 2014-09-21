@@ -40,15 +40,19 @@ class Match(models.Model):
 
     player_2 = models.CharField(max_length=100)
 
+    p1_point_change = models.IntegerField()
+    p2_point_change = models.IntegerField()
     p1_wins = models.IntegerField(default=0)
     p2_wins = models.IntegerField(default=0)
 
     games = models.ManyToManyField(MatchGame)
 
-    timestamp = models.BigIntegerField(default=int(round(time.time())))
+    timestamp = models.BigIntegerField(default=0)
 
     def __unicode__(self):
         output =  "\nTeam 1: " + self.player_1 + \
+                  "\nTeam 1 Point Change: " + str(self.p1_point_change) + \
+                  "\nTeam 2 Point Change: " + str(self.p2_point_change) + \
                 "\nTeam 2: " + self.player_2 + \
                 "\nTeam 1 Wins: " + str(self.p1_wins) + \
                 "\nTeam 2 Wins: " + str(self.p2_wins) + \
@@ -77,6 +81,8 @@ class Player(models.Model):
     elo_singles_ranking         = models.IntegerField(default=1200)
 
     games = models.ManyToManyField(Game)
+
+    matches = models.ManyToManyField(Match)
 
     def __unicode__(self):
         return "\nEmail: " + self.user.email + \
