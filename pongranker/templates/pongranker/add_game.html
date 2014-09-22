@@ -130,6 +130,7 @@
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script>
+
         var player_1_list = document.getElementById('player1drop');
         var player_2_list = document.getElementById('player3drop');
         var emailList = new Array();
@@ -157,11 +158,7 @@
         };
 
         $(document).ready(function() {
-
             $('ul').on('click','li', function (evt) {
-                console.log(this);
-                console.log(evt);
-                console.log(evt.currentTarget.parentNode.id);
                 // set the proper input
                 if(evt.currentTarget.parentNode.id == "player1drop") {
                     $("#player_1").val(emailList[$(this).text()]);
@@ -173,11 +170,6 @@
                 $(this).closest('.input-group-btn').children('button').text($(this).text());
 
             });
-
-            $(#add_game_btn).click(function() {
-
-
-            };);
        });
 
 
