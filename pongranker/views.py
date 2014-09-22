@@ -104,8 +104,8 @@ def add_game(request):
         player_1_name  = player_1.user.first_name + " " + player_1.user.last_name[0]
         player_3_name  = player_3.user.first_name + " " + player_3.user.last_name[0]
         i = 0
-        for score1 in player_1_scores:
-          score_list.append((score1, player_3_scores[i]))
+        for score in player_1_scores:
+          score_list.append((score, player_3_scores[i]))
           i = i+1
 
       else:

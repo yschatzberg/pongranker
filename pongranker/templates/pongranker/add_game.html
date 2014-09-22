@@ -75,8 +75,14 @@
                               </ul>
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_1" name="player_1" type="hidden" required="required">
-                           <input type="text" class="form-control" name="score_1_1" placeholder="Score" required="required">
+
                         </div><!-- /input-group -->
+                        <br>
+                        <div class="input-group col-lg-2 col-md-2">
+                            <input type="text" class="form-control" name="score_1_1" placeholder="Score" required="required">
+                        </div>
+                        <button type="button" id="add_game_btn" class="btn btn-default btn-circle">+</button>
+
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-6">
@@ -93,8 +99,11 @@
                               </ul>
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_3" name="player_3" type="hidden">
-                           <input type="text" class="form-control" name="score_2_1" placeholder="Score" required="required">
                         </div><!-- /input-group -->
+                        <br>
+                        <div class="input-group col-lg-2 col-md-2">
+                           <input type="text" class="form-control" name="score_2_1" placeholder="Score" required="required">
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-2 col-lg-offset-5" style="text-align: center">
@@ -138,7 +147,11 @@
 
                     emailList[element] = index;
                 });
-        });};
+        });
+
+
+
+        };
 
         $(document).ready(function() {
 
@@ -157,6 +170,11 @@
                 $(this).closest('.input-group-btn').children('button').text($(this).text());
 
             });
+
+            $(#add_game_btn).click(function() {
+
+
+            };);
        });
 
 

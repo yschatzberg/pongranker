@@ -40,8 +40,8 @@ class Match(models.Model):
 
     player_2 = models.CharField(max_length=100)
 
-    p1_point_change = models.IntegerField()
-    p2_point_change = models.IntegerField()
+    p1_point_change = models.IntegerField(default=0)
+    p2_point_change = models.IntegerField(default=0)
     p1_wins = models.IntegerField(default=0)
     p2_wins = models.IntegerField(default=0)
 
