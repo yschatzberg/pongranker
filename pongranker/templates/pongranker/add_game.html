@@ -8,7 +8,6 @@
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-
 </head>
   <body>
     <div class="container">
@@ -41,9 +40,6 @@
                         <li><a href="/logout/">Logout</a></li>
                       </ul>
                     </li>
-                    <form class="navbar-form navbar-right" action="/add_game/">
-                       <button type="submit" class="btn btn-primary">Add Game</button>
-                    </form>
                 {% else %}
                     <form class="navbar-form navbar-right" action="/login/">
                         <a href="/register/">Sign Up</a>
@@ -61,12 +57,10 @@
             {% endif %}
             <form name="add_game_form" action="/add_game/" method="post">
                     {% csrf_token %}
-                    {% if error_msg %}
-                        <h1 style="text-align: center">{{ error_msg }}</h1>
-                    {% endif %}
+                <h1 style="text-align: center" id="error_message"></h1>
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="jumbotron">
-                        <h2 style="text-align: center">Player 1</h2>
+                        <h2 style="text-align: center">Team 1</h2>
                         <div class="input-group">
                            <div class="input-group-btn">
                               <button type="button" class="btn btn-default
@@ -74,23 +68,56 @@
                                  Choose Player
                                  <span class="caret"></span>
                               </button>
-                              <ul class="dropdown-menu" id="player1drop">
+                              <ul class="dropdown-menu" id="player_0_0">
                               </ul>
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_1" name="player_1" type="hidden" required="required">
 
                         </div><!-- /input-group -->
-                        <br>
-                        <div class="input-group col-lg-2 col-md-2">
-                            <input type="text" class="form-control" name="score_1_1" placeholder="Score" required="required">
+                        <div id="games_0">
+<!--
+                            <br>
+                            <div class="row" style="text-align: center">
+                               <div class="col-lg-3">
+                                   <h5>Game 1:</h5>
+                               </div>
+                               <div class="col-lg-9" id="game_0_0">
+
+                                   <div class="btn-group">
+                                      <button type="button" class="btn btn-default btn-sm">0</button>
+                                      <button type="button" class="btn btn-default btn-sm">1</button>
+                                      <button type="button" class="btn btn-default btn-sm">2</button>
+                                      <button type="button" class="btn btn-default btn-sm">3</button>
+                                      <button type="button" class="btn btn-default btn-sm">4</button>
+                                      <button type="button" class="btn btn-default btn-sm">5</button>
+                                   </div>
+                                   <br>
+                                   <div class="btn-group">
+                                     <button type="button" class="btn btn-default btn-sm">6</button>
+                                     <button type="button" class="btn btn-default btn-sm">7</button>
+                                     <button type="button" class="btn btn-default btn-sm">8</button>
+                                     <button type="button" class="btn btn-default btn-sm">9</button>
+                                     <button type="button" class="btn btn-default btn-sm">10</button>
+                                     <button type="button" class="btn btn-default btn-sm">11</button>
+                                   </div>
+
+                               </div>
+                            </div> --><!--/row-->
+
                         </div>
-                        <!--<button type="button" id="add_game_btn" class="btn btn-default btn-circle">+</button>-->
+                        <div class="row" style="text-align: center">
+                            <br>
+                            <div class="col-lg-4">
+                                <button type="button" id="add_game_btn" class="btn btn-default">+</button>
+                            </div>
+
+                        </div>
 
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-6">
                     <div class="jumbotron">
-                        <h2 style="text-align: center">Player 2</h2>
+                        <h2 style="text-align: center">Team 2</h2>
                         <div class="input-group">
                            <div class="input-group-btn">
                               <button type="button" class="btn btn-default
@@ -98,19 +125,20 @@
                                  Choose Player
                                  <span class="caret"></span>
                               </button>
-                              <ul class="dropdown-menu" id="player3drop">
+                              <ul class="dropdown-menu" id="player_1_0">
                               </ul>
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_3" name="player_3" type="hidden">
                         </div><!-- /input-group -->
-                        <br>
-                        <div class="input-group col-lg-2 col-md-2">
-                           <input type="text" class="form-control" name="score_2_1" placeholder="Score" required="required">
+                        <div id="games_1">
+
                         </div>
-                    </div>
+                        <!-- padding -->
+                        <p></p><br><br>
+                    </div> <!--/jumbotron-->
                 </div>
                 <div class="col-lg-2 col-lg-offset-5" style="text-align: center">
-                <button type="submit" class="btn btn-primary">Submit Game</button>
+                <button type="button" class="btn btn-primary" id="submit_match">Submit Match</button>
                 </div>
 
             </form>
@@ -131,10 +159,68 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script>
 
-        var player_1_list = document.getElementById('player1drop');
-        var player_2_list = document.getElementById('player3drop');
+        var player_1_list = document.getElementById('player_0_0');
+        var player_2_list = document.getElementById('player_1_0');
         var emailList = new Array();
+        var SCORES = [];
+        var PLAYERS = [];
+        var activeButton = [];
+        var number_of_games = 0;
+
+        function addGame(team_number, game_number) {
+            //create buttons
+            var buttonArray = Array();
+            for ( var i = 0; i < 13; i++ ) {
+                buttonArray[i] = $('<button>', {
+                                    type:   "button",
+                                    class:  "btn btn-default btn-sm",
+                                    id: "score-btn",
+                                    text:   i
+                });
+            }
+            // create button groups
+            var button_group_1 = $('<div>', { class: "btn-group" });
+            for (var i = 0; i < 7; i++) {
+                button_group_1.append(buttonArray[i]);
+            }
+            var button_group_2 = $('<div>', { class: "btn-group" });
+            for (var i = 7; i < 13; i++) {
+                button_group_2.append(buttonArray[i]);
+            }
+
+           var total = $('<div>', { class: 'row', style :  "text-align: center"})
+                            .append($('<div>')
+                                .addClass('col-lg-3')
+                                .append($('<h5>')
+                                    .text("Game " + (game_number + 1).toString())
+
+                                )
+                            )
+                            .append($('<div>')
+                                .addClass('col-lg-9')
+                                .attr("id", "game_" + team_number.toString() + "_" + game_number.toString())
+                                .append(button_group_1)
+                                .append($('<br>'))
+                                .append(button_group_2)
+                            );
+           return total;
+        }
+
+        function addGames() {
+
+            $('#games_0').append($('<br>'));
+            $('#games_1').append($('<br>'));
+
+            $('#games_0').append(addGame(0,number_of_games));
+            $('#games_1').append(addGame(1,number_of_games));
+            number_of_games++;
+        }
+
         window.onload = function(){
+           SCORES[0] = [];
+           SCORES[1] = [];
+           PLAYERS[0] = [];
+           PLAYERS[1] = [];
            $.getJSON('../api/player_emails_and_names', { }, function(data) {
                 $.each(data, function(index, element) {
                     var link1 = document.createElement('a');
@@ -151,29 +237,135 @@
 
                     emailList[element] = index;
                 });
-        });
 
+            });
 
+            $.ajaxSetup({
+                 beforeSend: function(xhr, settings) {
+                     function getCookie(name) {
+                         var cookieValue = null;
+                         if (document.cookie && document.cookie != '') {
+                             var cookies = document.cookie.split(';');
+                             for (var i = 0; i < cookies.length; i++) {
+                                 var cookie = jQuery.trim(cookies[i]);
+                                 // Does this cookie string begin with the name we want?
+                             if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                 break;
+                             }
+                         }
+                     }
+                     return cookieValue;
+                     }
+                     if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                         // Only send the token to relative URLs i.e. locally.
+                         xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                     }
+                 }
+            });
+            addGames();
 
         };
 
         $(document).ready(function() {
+            // on dropdown click, set the players correctly.
             $('ul').on('click','li', function (evt) {
-                // set the proper input
-                if(evt.currentTarget.parentNode.id == "player1drop") {
-                    $("#player_1").val(emailList[$(this).text()]);
+
+                var player_id = $(this).parent().attr('id');
+                // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
+                var array = player_id.split('_');
+
+                if (array.length > 2) {
+                    var team = parseInt(array[1],0);
+                    var player = parseInt(array[2],0);
                 }
-                // player 3 is "player 2" because in teams, p1 and p2 are same team.
-                else {
-                    $("#player_3").val(emailList[$(this).text()]);
-                }
+                var player_email = emailList[$(this).text()];
+
+                PLAYERS[team][player] = player_email;
                 $(this).closest('.input-group-btn').children('button').text($(this).text());
+            });
+
+            // on a score button click, record the score
+            $('body').on('click', '#score-btn', function(evt) {
+                // get the game ID
+                var game_id = $(this).parent().parent().attr('id');
+                // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
+                var array = game_id.split('_');
+
+
+                if (array.length > 2) {
+                    var team = parseInt(array[1],0);
+                    var game = parseInt(array[2],0);
+                }
+
+                var score = parseInt($(this).text(),0);
+
+
+                SCORES[team][game] = score;
+
+                // deactivate last button, active current button.
+                if (activeButton[game_id] != undefined) {
+                    $(activeButton[game_id]).removeClass('active');
+                }
+                $(this).addClass('active');
+                activeButton[game_id] = this;
+            });
+
+            //JSON.stringify({team_1: {players: [], scores: []}, team_2: {players: [], scores: []}});
+            //check for undefined array items within length or scores arrays.
+            $("#submit_match").click( function() {
+                //build a JSON from Players and Scores
+                var post_json = {};
+
+                var team_1 = new Object();
+                team_1.players = PLAYERS[0];
+                team_1.scores = SCORES[0];
+
+                var team_2 = new Object();
+                team_2.players = PLAYERS[1];
+                team_2.scores = SCORES[1];
+
+                console.log(team_1.scores.length % 2);
+                console.log(team_2.scores.length % 2);
+                if (team_1.players.length === 0 || team_2.players.length === 0) {
+                    $('#error_message').text( "You must choose at least 1 player for each team.");
+                }
+                else if (team_1.scores.length != team_2.scores.length || team_1.scores.length != number_of_games) {
+                    $('#error_message').text( "Please choose a score both teams in every game.");
+                }
+                else if ( (team_1.scores.length % 2) === 0 || (team_2.scores.length % 2) === 0 ) {
+                    $('#error_message').text( "Number of games must be odd. (Who's the winner?)");
+                }
+                else {
+                    post_json["team_1"] = JSON.stringify(team_1);
+                    post_json['team_2'] = JSON.stringify(team_2);
+
+                    //post_json = JSON.stringify(post_json);
+
+                    $.post("/api/post_match/", post_json, function(data) {
+                            console.log(data['error']);
+                            console.log(data['message']);
+
+                            if (data['error'] == 0) {
+                                window.location.href = window.location.href;
+                            }
+
+
+
+
+                        }
+                    );
+                }
 
             });
+
+            $("#add_game_btn").click( function() {
+               addGames();
+            });
+
+
+
        });
-
-
-
     </script>
 
 

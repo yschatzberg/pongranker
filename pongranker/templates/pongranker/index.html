@@ -48,9 +48,6 @@
                         <li><a href="/logout/">Logout</a></li>
                       </ul>
                     </li>
-                    <form class="navbar-form navbar-right" action="/add_game/">
-                       <button type="submit" class="btn btn-primary">Add Game</button>
-                    </form>
                 {% else %}
                     <form class="navbar-form navbar-right" action="/login/">
                         <a href="/register/">Sign Up</a>
@@ -66,7 +63,7 @@
 
         <div class="row">
             <!-- Player Rankings Panel -->
-            <div class="col-lg-8 col-lg-offset-2">
+            <div class="col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <h3 class="panel-title text-center">Singles Rankings</h3>
@@ -87,17 +84,17 @@
                 </div>
             </div>
 
-            <!--
+
             <div class="col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
-                    <h3 class="panel-title text-center">Recent Games</h3>
+                    <h3 class="panel-title text-center">Recent Matches</h3>
                   </div>
                       <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-2" style="text-align: center">
                             <form class="" action="/add_game/">
-                               <button type="submit" class="btn btn-primary">Add Game</button>
+                               <button type="submit" class="btn btn-primary">Add Match</button>
                             </form>
                                 <br/>
                                 </div>
@@ -107,7 +104,6 @@
                       </div>
                 </div>
             </div>
-            -->
         </div>
 
 
@@ -121,93 +117,208 @@
     <script>
         window.onload = function(){
             //populate games list
-           $.getJSON('../api/games', {max_games:5}, function(data) {
+            /* Builds THESE objects:
+                <li class="list-group-item">
+                    <div class="header">
+                        <span class="bold pull-right">Game Date</span>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <p style="text-align: center;">
+                                    <span class="bold loss">Player 1</span>
+                                    <br>
+                                    wins: #wins
+                                </p>
+                            </div>
+                            <div class="col-lg-1">
+                                <p>vs.</p>
+                            </div>
+                            <div class="col-lg-3">
+                                <p style="text-align: center;">
+                                    <span class="bold win">Player 2</span>
+                                    <br>
+                                    wins: # wins
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content" style="display: none">
+                        <div class="row">
+                            <div class="col-lg-7" style="text-align: center">
+                                <p class="bold">Games</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                 <p style="text-align: center;">game_1 score</p>
+                            </div>
+                            <div class="col-lg-1">
+                                <p>-</p>
+                            </div>
+                            <div class="col-lg-3">
+                                 <p style="text-align: center;">game_1 score</p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            */
+           $.getJSON('../api/matches', {max_matches:5}, function(data) {
                 $.each(data, function(index, element) {
-                    //element is teh game json
-                    console.log(element);
-                    var li = document.createElement('li');
-                    li.className = "list-group-item";
-
+                    match_date = new Date(element['timestamp'] * 1000);
                     var date_span = document.createElement('span');
                     date_span.className = "bold pull-right";
-                    date_span.appendChild(document.createTextNode(element['game_date']));
-                    li.appendChild(date_span);
+                    date_span.appendChild(document.createTextNode(match_date.toDateString()));
+
 
                     var row_div = document.createElement('div');
                     row_div.className = "row";
 
 
                     // Add Player 1
-                    var p1_div = document.createElement('div');
-                    p1_div.className = "col-lg-3";
-
-                    var p1_par = document.createElement('p');
-                    p1_par.style.textAlign="center";
-
-                    var p1_span = document.createElement('span');
-                    p1_span.appendChild(document.createTextNode(element['player_1']));
-
-
-                    p1_par.appendChild(p1_span);
-                    //add br here.
-                    var brk =document.createElement('br');
-                    p1_par.appendChild(brk);
-                    p1_par.appendChild(document.createTextNode(element['score_1']));
-
-                    p1_div.appendChild(p1_par);
-
-                    row_div.appendChild(p1_div);
-
+                    row_div.appendChild(buildSinglePlayerHeader(element['player_1'], element['p1_wins'], element['p1_wins'] > element['p2_wins']));
 
                     //add vs.
                     var vs_div = document.createElement('div');
                     vs_div.className = 'col-lg-1';
-
-                    var vs_par = document.createElement('p');
-                    vs_par.appendChild(document.createTextNode("vs."));
-
-                    vs_div.appendChild(vs_par);
-
+                    $(vs_div).append("<p>").text("vs.");
                     row_div.appendChild(vs_div);
 
 
                     // Add player 2
-                    var p2_div = document.createElement('div');
-                    p2_div.className = "col-lg-3";
+                    row_div.appendChild(buildSinglePlayerHeader(element['player_2'], element['p2_wins'], element['p2_wins'] > element['p1_wins']));
 
-                    var p2_par = document.createElement('p');
-                    p2_par.style.textAlign="center";
+                    var header = document.createElement('div');
+                    header.className = "header";
+                    header.appendChild(date_span);
+                    header.appendChild(row_div);
 
-                    var p2_span = document.createElement('span');
-                    p2_span.className = "bold";
-                    p2_span.appendChild(document.createTextNode(element['player_2']));
+                    // build the content
+                    var content = buildContent(element['games']);
 
-                    p2_par.appendChild(p2_span);
 
-                    //add br here.
-                    var brk =document.createElement('br');
-                    p2_par.appendChild(brk);
-                    p2_par.appendChild(document.createTextNode(element['score_2']));
+                    var li = document.createElement('li');
+                    li.className = "list-group-item";
+                    li.appendChild(header);
+                    li.appendChild(content);
 
-                    p2_div.appendChild(p2_par);
-
-                    row_div.appendChild(p2_div);
-
-                    if (element['score_1'] > element['score_2']) {
-                        p1_span.className = "bold win";
-                        p2_span.className = "bold loss";
-                    }
-                    else {
-                        p1_span.className = "bold loss";
-                        p2_span.className = "bold win";
-                    }
-
-                    li.appendChild(row_div);
+                    //var div = document.createElement('div');
+                    //div.appendChild(li);
 
                     list = document.getElementById('game_list');
                     list.appendChild(li);
                 });
            });};
+
+           $(document).ready(function() {
+
+            // allow expansion of content in games list.
+            $('#game_list').on('click','li', function (evt) {
+                header = $(this).children(":first");
+                //getting the next element
+                content = header.next();
+                //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+                content.slideToggle(300);
+            });
+
+
+       });
+
+       function buildSinglePlayerHeader(player_name, wins, winner) {
+            var div = document.createElement('div');
+            div.className = "col-lg-3";
+
+            var par = document.createElement('p');
+            par.style.textAlign="center";
+
+            var name_span = document.createElement('span');
+            name_span.appendChild(document.createTextNode(player_name));
+
+            if (winner) {
+                name_span.className = "bold win";
+            }
+            else {
+                name_span.className = "bold loss";
+            }
+
+
+            par.appendChild(name_span);
+            //add br here.
+            var brk =document.createElement('br');
+            par.appendChild(brk);
+            par.appendChild(document.createTextNode(wins));
+
+            div.appendChild(par);
+
+            return div;
+       }
+
+       function buildContent(games) {
+            var content = document.createElement('div');
+            content.className = "content";
+            content.style.display ="none";
+
+            /*
+            <div class="row">
+                <div class="col-lg-7" style="text-align: center">
+                    <p class="bold">Games</p>
+                </div>
+            </div>
+            */
+            var games_row = document.createElement('div');
+            games_row.className += "row";
+            var games_div = document.createElement('div');
+            games_div.className += "col-lg-7";
+            games_div.style.textAlign = "center";
+            console.log("her1e");
+
+            $(games_div).append($("<p>")
+                .addClass('bold')
+                .text("Games")
+                );
+            console.log("here");
+            games_row.appendChild(games_div);
+
+            content.appendChild(games_row);
+
+            console.log(content);
+
+            //content.appendChild(games_row);
+
+            $.each(games, function(index, element) {
+            console.log(element);
+                    var row = document.createElement('div');
+                    row.className += "row";
+                   row.appendChild(buildGameScore(element['score_1']));
+
+
+                    var div = document.createElement('div');
+                    div.className += 'col-lg-1';
+                    $(div).append("<p>").text("-");
+                    row.appendChild(div);
+
+                   row.appendChild(buildGameScore(element['score_2']));
+                   content.appendChild(row);
+            });
+
+            return content;
+       }
+
+       /*
+        build this:
+        <div class="col-lg-3">
+             <p style="text-align: center;">game_1 score</p>
+        </div>
+       */
+       function buildGameScore(score) {
+            var div = document.createElement('div');
+            div.className += 'col-lg-3';
+
+            var p = document.createElement('p');
+            p.style.textAlign = "center";
+            $(p).text(score);
+
+            div.appendChild(p);
+            return div;
+       }
     </script>
   </body>
 </html>
