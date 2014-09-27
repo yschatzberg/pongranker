@@ -325,16 +325,34 @@
                 team_2.players = PLAYERS[1];
                 team_2.scores = SCORES[1];
 
-                console.log(team_1.scores.length % 2);
-                console.log(team_2.scores.length % 2);
+                var t1_wins = 0;
+                var t2_wins = 0;
+                //calculate lengths
+                for (var i = 0; i < team_1.scores.length; i++) {
+                  if ( team_1.scores[i] >  team_2.scores[i] ){
+                    t1_wins++;
+                  }
+                  else if (team_2.scores[i] >  team_1.scores[i]) {
+                    t2_wins++;
+                  }
+                  else {
+                    t2_wins++;
+                    t1_wins++;
+                  }
+                }
+
                 if (team_1.players.length === 0 || team_2.players.length === 0) {
                     $('#error_message').text( "You must choose at least 1 player for each team.");
+                }
+                else if (team_1.scores.length === 0 || team_2.scores.length === 0) {
+                    $('#error_message').text( "Choose a score for the game.");
+
                 }
                 else if (team_1.scores.length != team_2.scores.length || team_1.scores.length != number_of_games) {
                     $('#error_message').text( "Please choose a score both teams in every game.");
                 }
-                else if ( (team_1.scores.length % 2) === 0 || (team_2.scores.length % 2) === 0 ) {
-                    $('#error_message').text( "Number of games must be odd. (Who's the winner?)");
+                else if ( t1_wins === t2_wins ) {
+                    $('#error_message').text( "One player must have more wins than the other. (Who's the winner?)");
                 }
                 else {
                     post_json["team_1"] = JSON.stringify(team_1);
