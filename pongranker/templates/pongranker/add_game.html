@@ -221,7 +221,7 @@
            SCORES[1] = [];
            PLAYERS[0] = [];
            PLAYERS[1] = [];
-           $.getJSON('../api/player_emails_and_names', { }, function(data) {
+           $.getJSON('/api/player_emails_and_names', { }, function(data) {
                 $.each(data, function(index, element) {
                     var link1 = document.createElement('a');
                     link1.appendChild(document.createTextNode(element));
@@ -269,7 +269,7 @@
 
         $(document).ready(function() {
             // on dropdown click, set the players correctly.
-            $('ul').on('click','li', function (evt) {
+            $('ul').on('click touchstart','li', function (evt) {
 
                 var player_id = $(this).parent().attr('id');
                 // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
@@ -286,7 +286,7 @@
             });
 
             // on a score button click, record the score
-            $('body').on('click', '#score-btn', function(evt) {
+            $('body').on('click touchstart', '#score-btn', function(evt) {
                 // get the game ID
                 var game_id = $(this).parent().parent().attr('id');
                 // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
@@ -377,7 +377,7 @@
 
             });
 
-            $("#add_game_btn").click( function() {
+            $("body").on('click touchstart', '#add_game_btn', function() {
                addGames();
             });
 
