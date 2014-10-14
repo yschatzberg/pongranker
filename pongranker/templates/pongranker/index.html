@@ -68,19 +68,11 @@
                   <div class="panel-heading">
                     <h3 class="panel-title text-center">Singles Rankings</h3>
                   </div>
-                  {% if player_list %}
                       <div class="panel-body">
-                        <ul class="list-group">
-                          {% for player in player_list %}
-                              <li class="list-group-item">
-                                  {{forloop.counter}}.
-                                  <span class="badge">{{ player.elo_singles_ranking }}</span>
-                                  {{ player.user.first_name }} {{ player.user.last_name }}
-                              </li>
-                          {% endfor %}
+                        <ul class="list-group" id="playerList">
+
                         </ul>
                       </div>
-                  {% endif %}
                 </div>
             </div>
 
@@ -116,6 +108,30 @@
 
     <script>
         window.onload = function(){
+            // populate player list
+            /* builds these objects
+                <li class="list-group-item">
+                                  {{forloop.counter}}.
+                                  <span class="badge">{{ player.elo_singles_ranking }}</span>
+                                  {{ player.user.first_name }} {{ player.user.last_name }}
+                              </li>
+            */
+           $.getJSON('/api/players_ranked', {}, function(data) {
+                $.each(data, function(index, element) {
+                    span = $('<span>').addClass("badge").text(element['ranking']);
+                    player_entry = $('<li>')
+                                .addClass("list-group-item")
+                                .text("Wins: " + element['wins'] + " Losses: " + element['losses'])
+                                .append($('<div>')
+                                            .addClass("col-lg-5")
+                                            .text((index+1) + ". " + element['name'])
+                                );
+                    player_entry.append(span);
+                    $("#playerList").append(player_entry);
+
+                });
+           });
+
             //populate games list
             /* Builds THESE objects:
                 <li class="list-group-item">
@@ -268,23 +284,19 @@
             var games_div = document.createElement('div');
             games_div.className += "col-lg-7";
             games_div.style.textAlign = "center";
-            console.log("her1e");
 
             $(games_div).append($("<p>")
                 .addClass('bold')
                 .text("Games")
                 );
-            console.log("here");
             games_row.appendChild(games_div);
 
             content.appendChild(games_row);
 
-            console.log(content);
 
             //content.appendChild(games_row);
 
             $.each(games, function(index, element) {
-            console.log(element);
                     var row = document.createElement('div');
                     row.className += "row";
                    row.appendChild(buildGameScore(element['score_1']));

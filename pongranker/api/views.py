@@ -53,15 +53,13 @@ def get_matches(request):
     response = []
 
     if request.method == 'GET':
-      param = request.GET.get('max_matches','')
-      if param:
-        max = int(param)
+      match_list = Match.objects.order_by("-timestamp")
+
+      max = request.GET.get('max_matches',len(match_list))
+      max = int(max)
 
 
-
-      match_list = Match.objects.order_by("-timestamp")[:max]
-
-      for match in match_list:
+      for match in match_list[:max]:
         match_json = {}
         match_json[u'player_1'] = match.player_1
         match_json[u'player_2'] = match.player_2
@@ -184,4 +182,25 @@ def post_match(request):
     return HttpResponse(json.dumps({"error": 0, "message": "OK"}), content_type="application/json")
 
 
+def get_players_ranked(request):
 
+    if request.method == 'GET':
+      response_json = {}
+      player_list = Player.objects.order_by('-elo_singles_ranking','-total_singles_wins')
+
+      max = request.GET.get('max_results', len(player_list))
+      max = int(max)
+
+      response_json = []
+      for player in player_list[:max]:
+        player_json = {}
+        player_json['name'] = player.user.first_name + " " + player.user.last_name
+        player_json['ranking'] = player.elo_singles_ranking
+        player_json['wins'] = player.total_singles_wins
+        player_json['losses'] = player.total_singles_losses
+
+        response_json.append(player_json)
+
+      return HttpResponse(json.dumps(response_json), content_type="application/json")
+    else:
+      return HttpResponse(json.dumps({"error": 10, "message": "Must use GET request to access this site."}), content_type="application/json")

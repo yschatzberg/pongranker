@@ -63,20 +63,11 @@
                   <div class="panel-heading">
                     <h3 class="panel-title text-center">Singles Top 3</h3>
                   </div>
-                  {% if player_list %}
                       <div class="panel-body">
-                        <ul class="list-group">
-                          {% for player in player_list %}
-                              <li class="list-group-item">
-                                  {{forloop.counter}}.
-                                  {{ player.user.first_name }} {{ player.user.last_name }}
-                                  <span class="badge">{{ player.elo_singles_ranking }}</span>
+                        <ul class="list-group" id="playerList">
 
-                              </li>
-                          {% endfor %}
                         </ul>
                       </div>
-                  {% endif %}
                 </div>
             </div>
         </div>
@@ -88,6 +79,34 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <script>
+        window.onload = function(){
+            // populate player list
+            /* builds these objects
+                <li class="list-group-item">
+                                  {{forloop.counter}}.
+                                  <span class="badge">{{ player.elo_singles_ranking }}</span>
+                                  {{ player.user.first_name }} {{ player.user.last_name }}
+                              </li>
+            */
+           $.getJSON('/api/players_ranked', {max_results: 3}, function(data) {
+                $.each(data, function(index, element) {
+                    span = $('<span>').addClass("badge").text(element['ranking']);
+                    player_entry = $('<li>')
+                                .addClass("list-group-item")
+                                .text("Wins: " + element['wins'] + " Losses: " + element['losses'])
+                                .append($('<div>')
+                                            .addClass("col-lg-5")
+                                            .text((index+1) + ". " + element['name'])
+                                );
+                    player_entry.append(span);
+                    $("#playerList").append(player_entry);
+
+                });
+           });
+       };
+    </script>
 
   </body>
 </html>
