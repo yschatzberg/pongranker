@@ -87,6 +87,7 @@ def get_matches(request):
 def post_match(request):
 
     if request.method == 'POST':
+
       team_1 = json.loads(request.POST['team_1'])
       team_2 = json.loads(request.POST['team_2'])
 
@@ -193,13 +194,14 @@ def get_players_ranked(request):
 
       response_json = []
       for player in player_list[:max]:
-        player_json = {}
-        player_json['name'] = player.user.first_name + " " + player.user.last_name
-        player_json['ranking'] = player.elo_singles_ranking
-        player_json['wins'] = player.total_singles_wins
-        player_json['losses'] = player.total_singles_losses
+        if (player.total_singles_wins + player.total_singles_losses) > 1:
+          player_json = {}
+          player_json['name'] = player.user.first_name + " " + player.user.last_name
+          player_json['ranking'] = player.elo_singles_ranking
+          player_json['wins'] = player.total_singles_wins
+          player_json['losses'] = player.total_singles_losses
 
-        response_json.append(player_json)
+          response_json.append(player_json)
 
       return HttpResponse(json.dumps(response_json), content_type="application/json")
     else:
