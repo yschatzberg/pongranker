@@ -51,15 +51,20 @@
           </div><!-- /.container-fluid -->
         </nav>
 
+
         <div class="row">
             {% if post_game_add %}
                 <h1 align="middle">Game added successfully</h1>
             {% endif %}
+
             <form name="add_game_form" action="/add_game/" method="post">
+
                     {% csrf_token %}
+
                 <h1 style="text-align: center" id="error_message"></h1>
-                <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="col-lg-6 col-md-6">
                     <div class="jumbotron">
+
                         <h2 style="text-align: center">Team 1</h2>
                         <div class="input-group">
                            <div class="input-group-btn">
@@ -115,7 +120,7 @@
 
                     </div>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
+                <div class="col-lg-6 col-md-6">
                     <div class="jumbotron">
                         <h2 style="text-align: center">Team 2</h2>
                         <div class="input-group">
@@ -270,7 +275,6 @@
         $(document).ready(function() {
             // on dropdown click, set the players correctly.
             $('ul').on('click touchstart','li', function (evt) {
-
                 var player_id = $(this).parent().attr('id');
                 // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
                 var array = player_id.split('_');
@@ -309,6 +313,7 @@
                 }
                 $(this).addClass('active');
                 activeButton[game_id] = this;
+
             });
 
             //JSON.stringify({team_1: {players: [], scores: []}, team_2: {players: [], scores: []}});
