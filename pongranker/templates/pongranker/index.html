@@ -331,7 +331,12 @@
 
             var p = document.createElement('p');
             p.style.textAlign = "center";
-            $(p).text(score);
+            if (score == 12) {
+                $(p).text("Deuce Win");
+            }
+            else if (score != 10) {
+                $(p).text(score);
+            }
 
             div.appendChild(p);
             return div;

@@ -175,21 +175,32 @@
         function addGame(team_number, game_number) {
             //create buttons
             var buttonArray = Array();
-            for ( var i = 0; i < 13; i++ ) {
+            for ( var i = 0; i < 11; i++ ) {
+                var textContent = i;
+                if (i >=10) {
+                    textContent = i+1;
+                }
                 buttonArray[i] = $('<button>', {
                                     type:   "button",
                                     class:  "btn btn-default btn-sm",
                                     id: "score-btn",
-                                    text:   i
+                                    text:   textContent
                 });
             }
+
+            buttonArray[11] = $('<button>', {
+                                    type:   "button",
+                                    class:  "btn btn-default btn-sm",
+                                    id: "score-btn-deuce-win",
+                                    text:   "Deuce Win"
+                });
             // create button groups
             var button_group_1 = $('<div>', { class: "btn-group" });
             for (var i = 0; i < 7; i++) {
                 button_group_1.append(buttonArray[i]);
             }
             var button_group_2 = $('<div>', { class: "btn-group" });
-            for (var i = 7; i < 13; i++) {
+            for (var i = 7; i < 12; i++) {
                 button_group_2.append(buttonArray[i]);
             }
 
@@ -291,8 +302,19 @@
 
             // on a score button click, record the score
             $('body').on('click touchstart', '#score-btn', function(evt) {
+                addScore(evt, $(this));
+
+            });
+
+            $('body').on('click touchstart', '#score-btn-deuce-win', function(evt) {
+                addScore(evt, $(this));
+
+            });
+
+            function addScore(evt, elmt) {
                 // get the game ID
-                var game_id = $(this).parent().parent().attr('id');
+                var game_id = $(elmt).parent().parent().attr('id');
+
                 // split into team and game number i.e. game_2_0 (first game for team 2) = [2,0]
                 var array = game_id.split('_');
 
@@ -302,8 +324,25 @@
                     var game = parseInt(array[2],0);
                 }
 
-                var score = parseInt($(this).text(),0);
+                var score = parseInt($(elmt).text(),0);
 
+                if ($(elmt).text() == "Deuce Win") {
+                    score = 12;
+                    if (team == 0) {
+                        SCORES[1][game] = 10;
+                        var other_game_id = "game_1_" + game
+                    }
+                    else {
+                        SCORES[0][game] = 10;
+                        var other_game_id = "game_0_" + game
+
+                    }
+                    if (activeButton[other_game_id] != undefined) {
+                    $(activeButton[other_game_id]).removeClass('active');
+                }
+
+                }
+                console.log(game_id);
 
                 SCORES[team][game] = score;
 
@@ -311,10 +350,9 @@
                 if (activeButton[game_id] != undefined) {
                     $(activeButton[game_id]).removeClass('active');
                 }
-                $(this).addClass('active');
-                activeButton[game_id] = this;
-
-            });
+                $(elmt).addClass('active');
+                activeButton[game_id] = elmt;
+            }
 
             //JSON.stringify({team_1: {players: [], scores: []}, team_2: {players: [], scores: []}});
             //check for undefined array items within length or scores arrays.
