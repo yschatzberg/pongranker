@@ -61,7 +61,7 @@
 
                     {% csrf_token %}
 
-                <h1 style="text-align: center" id="error_message"></h1>
+
                 <div class="col-lg-6 col-md-6">
                     <div class="jumbotron">
 
@@ -112,8 +112,11 @@
                         </div>
                         <div class="row" style="text-align: center">
                             <br>
-                            <div class="col-lg-4">
+                            <div class="col-lg-2">
                                 <button type="button" id="add_game_btn" class="btn btn-default">+</button>
+                            </div>
+                            <div class="col-lg-2">
+                                <button type="button" id="rm_game_btn" class="btn btn-default">-</button>
                             </div>
 
                         </div>
@@ -142,6 +145,7 @@
                         <p></p><br><br>
                     </div> <!--/jumbotron-->
                 </div>
+                <div class="col-lg-6 col-lg-offset-3" style="text-align: center" id="error_message"></div>
                 <div class="col-lg-2 col-lg-offset-5" style="text-align: center">
                 <button type="button" class="btn btn-primary" id="submit_match">Submit Match</button>
                 </div>
@@ -230,6 +234,17 @@
             $('#games_0').append(addGame(0,number_of_games));
             $('#games_1').append(addGame(1,number_of_games));
             number_of_games++;
+        }
+
+        function removeGames() {
+            $("#games_0").children().last().remove();
+            $("#games_0").children().last().remove();
+            $("#games_1").children().last().remove();
+            $("#games_1").children().last().remove();
+            SCORES[0].pop();
+            SCORES[1].pop();
+            console.log(SCORES);
+            number_of_games--;
         }
 
         window.onload = function(){
@@ -338,16 +353,25 @@
 
                     }
                     if (activeButton[other_game_id] != undefined) {
-                    $(activeButton[other_game_id]).removeClass('active');
-                }
+                        $(activeButton[other_game_id]).removeClass('active');
+                    }
 
                 }
-                console.log(game_id);
 
                 SCORES[team][game] = score;
+                console.log(SCORES);
+
 
                 // deactivate last button, active current button.
                 if (activeButton[game_id] != undefined) {
+                    if (activeButton[game_id].text() == "Deuce Win") {
+                        if (team == 0) {
+                            SCORES[1].pop();
+                        }
+                        else {
+                            SCORES[0].pop();
+                        }
+                    }
                     $(activeButton[game_id]).removeClass('active');
                 }
                 $(elmt).addClass('active');
@@ -357,6 +381,12 @@
             //JSON.stringify({team_1: {players: [], scores: []}, team_2: {players: [], scores: []}});
             //check for undefined array items within length or scores arrays.
             $("#submit_match").click( function() {
+
+                // if it's been clicked recently, exit
+                if ( $(this).hasClass('active')) {
+                    return;
+                }
+                $(this).addClass('active');
                 //build a JSON from Players and Scores
                 var post_json = {};
 
@@ -385,17 +415,73 @@
                 }
 
                 if (team_1.players.length === 0 || team_2.players.length === 0) {
-                    $('#error_message').text( "You must choose at least 1 player for each team.");
+                    $('#error_message').append($('<div>', {
+                                                class:  "alert alert-danger alert-dismissible",
+                                                role: "alert",
+                                                text:   "You must choose at least 1 player for each team.",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
                 }
                 else if (team_1.scores.length === 0 || team_2.scores.length === 0) {
-                    $('#error_message').text( "Choose a score for the game.");
+                    $('#error_message').append($('<div>', {
+                                                class:  "alert alert-danger alert-dismissible",
+                                                role: "alert",
+                                                text:   "Choose a score for the game.",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
 
                 }
                 else if (team_1.scores.length != team_2.scores.length || team_1.scores.length != number_of_games) {
-                    $('#error_message').text( "Please choose a score both teams in every game.");
+                    $('#error_message').append($('<div>', {
+                                                class:  "alert alert-danger alert-dismissible",
+                                                role: "alert",
+                                                text:   "Please choose a score both teams in every game.",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
                 }
                 else if ( t1_wins === t2_wins ) {
-                    $('#error_message').text( "One player must have more wins than the other. (Who's the winner?)");
+                    $('#error_message').append($('<div>', {
+                                                class:  "alert alert-danger alert-dismissible",
+                                                role: "alert",
+                                                text:   "One player must have more wins than the other. (Who's the winner?)",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
                 }
                 else {
                     post_json["team_1"] = JSON.stringify(team_1);
@@ -417,11 +503,28 @@
                         }
                     );
                 }
+                var fade_out = function() {
+                  $("#err-div").fadeOut(800);
+                  setTimeout(remove, 800);
+                }
+                var remove = function() {
+                    $("#err-div").remove()
+                }
+                var remove_active = function() {
+                    $("#submit_match").removeClass('active');
+                }
+
+                setTimeout(fade_out, 5000);
+                setTimeout(remove_active, 1000);
 
             });
 
             $("body").on('click touchstart', '#add_game_btn', function() {
                addGames();
+            });
+
+            $("body").on('click touchstart', '#rm_game_btn', function() {
+               removeGames();
             });
 
 
