@@ -176,6 +176,30 @@
         var activeButton = [];
         var number_of_games = 0;
 
+        var fade_out = function() {
+          $("#err-div").fadeOut(800);
+          setTimeout(remove, 800);
+        }
+        var remove = function() {
+            $("#err-div").remove()
+        }
+        var remove_active = function() {
+            $("#submit_match").removeClass('active');
+        }
+
+        function getUrlParameter(sParam)
+        {
+            var sPageURL = window.location.search.substring(1);
+            var sURLVariables = sPageURL.split('&');
+            for (var i = 0; i < sURLVariables.length; i++)
+            {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] == sParam)
+                {
+                    return sParameterName[1];
+                }
+            }
+        }
         function addGame(team_number, game_number) {
             //create buttons
             var buttonArray = Array();
@@ -299,6 +323,26 @@
         };
 
         $(document).ready(function() {
+            if (getUrlParameter('match_added') == 'success' ){
+                $('#error_message').append($('<div>', {
+                                                class:  "alert alert-success alert-dismissible",
+                                                role: "alert",
+                                                text:   "Game added Successfully.",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
+                setTimeout(fade_out, 5000);
+
+            }
+
             // on dropdown click, set the players correctly.
             $('ul').on('click touchstart','li', function (evt) {
                 var player_id = $(this).parent().attr('id');
@@ -490,29 +534,31 @@
                     //post_json = JSON.stringify(post_json);
 
                     $.post("/api/post_match/", post_json, function(data) {
-                            console.log(data['error']);
-                            console.log(data['message']);
 
                             if (data['error'] == 0) {
-                                window.location.href = window.location.href;
+
+                                var options = "match_added=success";
+                                // if the option already exists, reload.
+                                if (window.location.href.indexOf("?".concat(options)) > -1) {
+                                    window.location.href = window.location.href
+                                }
+                                //else build in the option.
+                                else {
+                                    if (window.location.href.slice(-1) == '?') {
+                                        options = "match_added=success";
+                                    }
+                                    else {
+                                        options = "?".concat(options);
+                                    }
+
+                                    window.location.href = window.location.href + options;
+                                }
                             }
-
-
-
 
                         }
                     );
                 }
-                var fade_out = function() {
-                  $("#err-div").fadeOut(800);
-                  setTimeout(remove, 800);
-                }
-                var remove = function() {
-                    $("#err-div").remove()
-                }
-                var remove_active = function() {
-                    $("#submit_match").removeClass('active');
-                }
+
 
                 setTimeout(fade_out, 5000);
                 setTimeout(remove_active, 1000);
