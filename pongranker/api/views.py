@@ -150,8 +150,6 @@ def post_match(request):
           team_2_players[0].elo_singles_ranking = round(new_ratings[1])
 
           #wins/losses for player and match
-          team_1_players[0].total_singles_wins += 1
-          team_2_players[0].total_singles_losses += 1
           match.p1_wins += 1
 
           # match point change
@@ -161,8 +159,7 @@ def post_match(request):
           new_ratings = rate_1vs1(team_2_players[0].elo_singles_ranking, team_1_players[0].elo_singles_ranking)
           team_2_players[0].elo_singles_ranking = round(new_ratings[0])
           team_1_players[0].elo_singles_ranking = round(new_ratings[1])
-          team_2_players[0].total_singles_wins += 1
-          team_1_players[0].total_singles_losses += 1
+
           match.p2_wins += 1
           match.p1_point_change = team_1_players[0].elo_singles_ranking - old_ratings[1]
           match.p2_point_change = team_2_players[0].elo_singles_ranking - old_ratings[0]
@@ -171,6 +168,14 @@ def post_match(request):
         match.games.add(g)
 
       match.save()
+
+      # Adding a win based on who won the match
+      if match.p1_wins > match.p2_wins:
+          team_1_players[0].total_singles_wins += 1
+          team_2_players[0].total_singles_losses += 1
+      else:
+          team_2_players[0].total_singles_wins += 1
+          team_1_players[0].total_singles_losses += 1
 
       for team_players in [team_1_players, team_2_players]:
         for player in team_players:
