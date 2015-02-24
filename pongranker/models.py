@@ -2,27 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import time
 import datetime
-class Game(models.Model):
 
-    # first player, alphabetically.  i.e. arzav jain before yoav schatzberg
-    # this is constructed by concatenating user.first_name user.last_name with a space
-    player_1 = models.CharField(max_length=100)
-
-    score_1    = models.IntegerField()
-
-    player_2 = models.CharField(max_length=100)
-
-    score_2    = models.IntegerField()
-
-    game_date  = models.DateField(auto_now_add=True, editable=False)
-
-    def __unicode__(self):
-        return "\nPlayer 1: " + self.player_1 + \
-                "\nPlayer 2: " + self.player_2 + \
-                "\nScore 1: " + str(self.score_1) + \
-                "\nScore 2: " + str(self.score_2) + \
-                "\nGame Date: " + str(self.game_date) + \
-               "\n"
 class MatchGame(models.Model):
     # score for player 1 in the Match
     score_1    = models.IntegerField()
@@ -79,8 +59,6 @@ class Player(models.Model):
 
     # players Singles Ranking.
     elo_singles_ranking         = models.IntegerField(default=1200)
-
-    games = models.ManyToManyField(Game)
 
     matches = models.ManyToManyField(Match)
 

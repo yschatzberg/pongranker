@@ -1,5 +1,5 @@
 from django.contrib import admin
-from pongranker.models import Player, SinglesMatchup, SinglesMatchupScore, Game
+from pongranker.models import Player, SinglesMatchup, SinglesMatchupScore, Match
 
 class SinglesMatchupScoreInline(admin.StackedInline):
     model = SinglesMatchupScore
@@ -18,7 +18,7 @@ class PlayerAdmin(admin.ModelAdmin):
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(SinglesMatchup)
 admin.site.register(SinglesMatchupScore)
-admin.site.register(Game)
+admin.site.register(Match)
 
 
 

@@ -5,7 +5,7 @@ from django.template import RequestContext
 import json, time
 from elo import rate_1vs1
 
-from pongranker.models import Player, Game, Match, MatchGame
+from pongranker.models import Player, Match, MatchGame
 from django.contrib.auth.models import User
 
 
@@ -16,33 +16,6 @@ def get_player_emails_and_names(request):
     for player in player_list:
       if not player.is_superuser:
         response[player.email] = player.first_name + " " + player.last_name
-
-    return HttpResponse(json.dumps(response), content_type="application/json")
-
-def get_games(request):
-
-    context = RequestContext(request)
-    max = 100
-    response = []
-
-    if request.method == 'GET':
-      param = request.GET.get('max_games','')
-      if param:
-        max = int(param)
-
-
-
-      game_list = Game.objects.order_by("-game_date")[:max]
-
-      for game in game_list:
-        game_json = {}
-        game_json[u'player_1'] = game.player_1
-        game_json[u'score_1'] =  game.score_1
-
-        game_json[u'player_2'] = game.player_2
-        game_json[u'score_2'] = game.score_2
-        game_json[u'game_date'] = str(game.game_date)
-        response.append(game_json)
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -124,8 +97,8 @@ def post_match(request):
       # scores are stored in team_1['scores']/team_2['scores']
 
       # TODO: make this work for 2 v 2
-      match = Match(player_1=(team_1_players[0].user.first_name + " " +team_1_players[0].user.last_name[0]),
-                    player_2=(team_2_players[0].user.first_name + " " +team_2_players[0].user.last_name[0]))
+      match = Match(player_1=(team_1_players[0].user.first_name + " " +team_1_players[0].user.last_name),
+                    player_2=(team_2_players[0].user.first_name + " " +team_2_players[0].user.last_name))
       match.timestamp = time.time()
       match.full_clean()
       match.save()
