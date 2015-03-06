@@ -2,60 +2,63 @@ __author__ = 'yoavschatzberg'
 from django.http import HttpResponse
 from django.template import RequestContext
 
-import json, time
+import json
+import time
 from elo import rate_1vs1
 
-from pongranker.models import Player, Match, MatchGame, DoublesTeam, DoublesMatch
+from pongranker.models import Player, Match, MatchGame, DoublesMatch
 from django.contrib.auth.models import User
 from pongranker.api import helper_functions
+
+
+# Returns the player names and emails, used for building player choice lists.
 def get_player_emails_and_names(request):
     player_list = User.objects.order_by('first_name', 'last_name')
 
     response = {}
     for player in player_list:
-      if not player.is_superuser:
-        response[player.email] = player.first_name + " " + player.last_name
+        if not player.is_superuser:
+            response[player.email] = player.first_name + " " + player.last_name
 
     return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 # TODO: change this to get_singles_matches and implement get_doubles_matches once DoublesMatch exists.
 def get_matches(request):
 
-    context = RequestContext(request)
-    max = 100
     response = []
 
     if request.method == 'GET':
-      match_list = Match.objects.order_by("-timestamp")
+        match_list = Match.objects.order_by("-timestamp")
 
-      max = request.GET.get('max_matches',len(match_list))
-      max = int(max)
+        max_matches = request.GET.get('max_matches', len(match_list))
+        max_matches = int(max_matches)
 
+        for match in match_list[:max_matches]:
+            match_json = {}
+            match_json[u'player_1'] = match.player_1
+            match_json[u'player_2'] = match.player_2
+            match_json[u'p1_point_change'] = match.team_1_point_change
+            match_json[u'p2_point_change'] = match.team_2_point_change
+            match_json[u'p1_wins'] = match.team_1_wins
+            match_json[u'p2_wins'] = match.team_2_wins
+            match_json[u'timestamp'] = match.timestamp
 
-      for match in match_list[:max]:
-        match_json = {}
-        match_json[u'player_1'] = match.player_1
-        match_json[u'player_2'] = match.player_2
-        match_json[u'p1_point_change'] = match.team_1_point_change
-        match_json[u'p2_point_change'] = match.team_2_point_change
-        match_json[u'p1_wins'] = match.team_1_wins
-        match_json[u'p2_wins'] = match.team_2_wins
-        match_json[u'timestamp'] = match.timestamp
+            games_json = []
 
-        games_json = []
+            for game in match.games.all():
+                game_json = {}
+                game_json[u'score_1'] = game.score_1
+                game_json[u'score_2'] = game.score_2
 
-        for game in match.games.all():
-          game_json = {}
-          game_json[u'score_1'] = game.score_1
-          game_json[u'score_2'] = game.score_2
+                games_json.append(game_json)
 
-          games_json.append(game_json)
+            match_json[u'games'] = games_json
 
-        match_json[u'games'] = games_json
-
-        response.append(match_json)
+            response.append(match_json)
 
     return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 # This is the new one
 def post_match(request):
@@ -63,7 +66,6 @@ def post_match(request):
 
         team_1_json = json.loads(request.POST['team_1'])
         team_2_json = json.loads(request.POST['team_2'])
-
 
         # Get team objects, might be a DoublesTeam, might be a Player
         try:
@@ -87,8 +89,10 @@ def post_match(request):
 
         # IF either team has more than on player, create a DoublesMatch
         if len(team_1_player_list) == 2 or len(team_2_player_list) == 2:
-            match = DoublesMatch(player_1=(team_1_player_list[0].user.first_name + " " + team_1_player_list[0].user.last_name),
-                    player_2=(team_2_player_list[0].user.first_name + " " + team_2_player_list[0].user.last_name))
+            match = DoublesMatch(
+                player_1=(team_1_player_list[0].user.first_name + " " + team_1_player_list[0].user.last_name),
+                player_2=(team_2_player_list[0].user.first_name + " " + team_2_player_list[0].user.last_name)
+            )
 
             # Add second player to the team (if it exists).
             if len(team_1_player_list) == 2:
@@ -97,22 +101,24 @@ def post_match(request):
                 match.player_4 = team_2_player_list[1].user.first_name + " " + team_2_player_list[1].user.last_name
         else:
             # Create Match object
-            match = Match(player_1=(team_1_player_list[0].user.first_name + " " + team_1_player_list[0].user.last_name),
-                    player_2=(team_2_player_list[0].user.first_name + " " + team_2_player_list[0].user.last_name))
+            match = Match(
+                player_1=(team_1_player_list[0].user.first_name + " " + team_1_player_list[0].user.last_name),
+                player_2=(team_2_player_list[0].user.first_name + " " + team_2_player_list[0].user.last_name)
+            )
 
         match.timestamp = time.time()
         match.full_clean()
         match.save()
 
-
-
         game_list = []
-        # for each score pare add a game
+        # for each score pair add a game
         for score in team_1_json['scores']:
             # Create game object
-            game = MatchGame(score_1=score,
-                         #get index of score in team_1['scores'] and get the team_2['scores'] item at that same index
-                         score_2=team_2_json['scores'][team_1_json['scores'].index(score)])
+            game = MatchGame(
+                score_1=score,
+                #get index of score in team_1['scores'] and get the team_2['scores'] item at that same index
+                score_2=team_2_json['scores'][team_1_json['scores'].index(score)]
+            )
 
             game.full_clean()
             game.save()
@@ -158,33 +164,38 @@ def post_match(request):
             team_1.total_losses += 1
 
         # If team is 1 player, only add it to them, otherwise, add to team object
+        # TODO: This will fail if one of the teams is a Doubles Team and the other is a Player
         for team in [team_1, team_2]:
             team.matches.add(match)
             team.save()
 
     return HttpResponse(json.dumps({"error": 0, "message": "OK"}), content_type="application/json")
 
+
 # TODO: Create get_teams_ranked
 def get_players_ranked(request):
 
     if request.method == 'GET':
-      response_json = {}
-      player_list = Player.objects.order_by('-elo_ranking','-total_wins')
+        response_json = {}
+        player_list = Player.objects.order_by('-elo_ranking','-total_wins')
 
-      max = request.GET.get('max_results', len(player_list))
-      max = int(max)
+        max_matches = request.GET.get('max_results', len(player_list))
+        max_matches = int(max_matches)
 
-      response_json = []
-      for player in player_list[:max]:
-        if (player.total_wins + player.total_losses) > 1:
-          player_json = {}
-          player_json['name'] = player.user.first_name + " " + player.user.last_name
-          player_json['ranking'] = player.elo_ranking
-          player_json['wins'] = player.total_wins
-          player_json['losses'] = player.total_losses
+        response_json = []
+        for player in player_list[:max_matches]:
+            if (player.total_wins + player.total_losses) > 1:
+                player_json = {}
+                player_json['name'] = player.user.first_name + " " + player.user.last_name
+                player_json['ranking'] = player.elo_ranking
+                player_json['wins'] = player.total_wins
+                player_json['losses'] = player.total_losses
 
-          response_json.append(player_json)
+                response_json.append(player_json)
 
-      return HttpResponse(json.dumps(response_json), content_type="application/json")
+        return HttpResponse(json.dumps(response_json), content_type="application/json")
     else:
-      return HttpResponse(json.dumps({"error": 10, "message": "Must use GET request to access this site."}), content_type="application/json")
+        return HttpResponse(
+            json.dumps({"error": 10, "message": "Must use GET request to access this site."}),
+            content_type="application/json"
+        )

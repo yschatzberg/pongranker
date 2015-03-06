@@ -135,7 +135,7 @@ class DoublesTeam(models.Model):
     team_name = models.CharField(max_length=100, default="")
 
     #matches for this team
-    matches = models.ManyToManyField(Match)
+    matches = models.ManyToManyField(DoublesMatch)
 
     def __unicode__(self):
         output = "\nTeam Name: " + self.team_name + \

@@ -67,6 +67,7 @@
 
                         <h2 style="text-align: center">Team 1</h2>
                         <div class="input-group">
+                            <!-- Player 1 -->
                            <div class="input-group-btn">
                               <button type="button" class="btn btn-default
                                  dropdown-toggle" data-toggle="dropdown" >
@@ -78,56 +79,32 @@
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_1" name="player_1" type="hidden" required="required">
 
+                            <!-- Player 2 -->
+                           <div class="input-group-btn">
+                              <button type="button" class="btn btn-default
+                                 dropdown-toggle" data-toggle="dropdown" >
+                                 Choose Player
+                                 <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" id="player_0_1">
+                              </ul>
+                           </div><!-- /btn-group -->
+                           <input class="span2" id="player_2" name="player_2" type="hidden" required="required">
+
                         </div><!-- /input-group -->
                         <div id="games_0">
-<!--
-                            <br>
-                            <div class="row" style="text-align: center">
-                               <div class="col-lg-3">
-                                   <h5>Game 1:</h5>
-                               </div>
-                               <div class="col-lg-9" id="game_0_0">
-
-                                   <div class="btn-group">
-                                      <button type="button" class="btn btn-default btn-sm">0</button>
-                                      <button type="button" class="btn btn-default btn-sm">1</button>
-                                      <button type="button" class="btn btn-default btn-sm">2</button>
-                                      <button type="button" class="btn btn-default btn-sm">3</button>
-                                      <button type="button" class="btn btn-default btn-sm">4</button>
-                                      <button type="button" class="btn btn-default btn-sm">5</button>
-                                   </div>
-                                   <br>
-                                   <div class="btn-group">
-                                     <button type="button" class="btn btn-default btn-sm">6</button>
-                                     <button type="button" class="btn btn-default btn-sm">7</button>
-                                     <button type="button" class="btn btn-default btn-sm">8</button>
-                                     <button type="button" class="btn btn-default btn-sm">9</button>
-                                     <button type="button" class="btn btn-default btn-sm">10</button>
-                                     <button type="button" class="btn btn-default btn-sm">11</button>
-                                   </div>
-
-                               </div>
-                            </div> --><!--/row-->
-
                         </div>
-                        <div class="row" style="text-align: center">
-                            <br>
-                            <div class="col-lg-2">
-                                <button type="button" id="add_game_btn" class="btn btn-default">+</button>
-                            </div>
-                            <div class="col-lg-2">
-                                <button type="button" id="rm_game_btn" class="btn btn-default">-</button>
-                            </div>
-
-                        </div>
-
+                        <!-- padding -->
+                        <p></p><br><br>
                     </div>
+
                 </div>
                 <div class="col-lg-6 col-md-6">
                     <div class="jumbotron">
                         <h2 style="text-align: center">Team 2</h2>
                         <div class="input-group">
-                           <div class="input-group-btn">
+                            <!-- Player 3 -->
+                            <div class="input-group-btn">
                               <button type="button" class="btn btn-default
                                  dropdown-toggle" data-toggle="dropdown" name="player_3">
                                  Choose Player
@@ -137,12 +114,32 @@
                               </ul>
                            </div><!-- /btn-group -->
                            <input class="span2" id="player_3" name="player_3" type="hidden">
+
+                            <!-- Player 4 -->
+                           <div class="input-group-btn">
+                              <button type="button" class="btn btn-default
+                                 dropdown-toggle" data-toggle="dropdown" name="player_3">
+                                 Choose Player
+                                 <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" id="player_1_1">
+                              </ul>
+                           </div><!-- /btn-group -->
+                           <input class="span2" id="player_4" name="player_4" type="hidden">
                         </div><!-- /input-group -->
                         <div id="games_1">
 
                         </div>
-                        <!-- padding -->
-                        <p></p><br><br>
+                        <div class="row" style="text-align: center">
+                            <br>
+                            <div class="col-lg-3">
+                                <button type="button" id="add_game_btn" class="btn btn-default">Add Game</button>
+                            </div>
+                            <div class="col-lg-3">
+                                <button type="button" id="rm_game_btn" class="btn btn-default">Remove Game</button>
+                            </div>
+
+                        </div>
                     </div> <!--/jumbotron-->
                 </div>
                 <div class="col-lg-6 col-lg-offset-3" style="text-align: center" id="error_message"></div>
@@ -169,7 +166,9 @@
     <script>
 
         var player_1_list = document.getElementById('player_0_0');
-        var player_2_list = document.getElementById('player_1_0');
+        var player_2_list = document.getElementById('player_0_1');
+        var player_3_list = document.getElementById('player_1_0');
+        var player_4_list = document.getElementById('player_1_1');
         var emailList = new Array();
         var SCORES = [];
         var PLAYERS = [];
@@ -267,7 +266,6 @@
             $("#games_1").children().last().remove();
             SCORES[0].pop();
             SCORES[1].pop();
-            console.log(SCORES);
             number_of_games--;
         }
 
@@ -278,6 +276,8 @@
            PLAYERS[1] = [];
            $.getJSON('/api/player_emails_and_names', { }, function(data) {
                 $.each(data, function(index, element) {
+
+                    // Team 1
                     var link1 = document.createElement('a');
                     link1.appendChild(document.createTextNode(element));
                     var liEntry1 = document.createElement('li');
@@ -289,6 +289,19 @@
                     var liEntry2 = document.createElement('li');
                     liEntry2.appendChild(link2);
                     player_2_list.appendChild(liEntry2);
+
+                    // Team 2
+                    var link3 = document.createElement('a');
+                    link3.appendChild(document.createTextNode(element));
+                    var liEntry3 = document.createElement('li');
+                    liEntry3.appendChild(link3);
+                    player_3_list.appendChild(liEntry3);
+
+                    var link4 = document.createElement('a');
+                    link4.appendChild(document.createTextNode(element));
+                    var liEntry4 = document.createElement('li');
+                    liEntry4.appendChild(link4);
+                    player_4_list.appendChild(liEntry4);
 
                     emailList[element] = index;
                 });
@@ -355,8 +368,39 @@
                 }
                 var player_email = emailList[$(this).text()];
 
+                // Replace text in dropdown button, add Caret
+                dropdown = $(this).closest('.input-group-btn').children('button');
+                dropdown.text($(this).text());
+
+
+                 // Add Unselect entry
+                /*if ($('ul#' + player_id + ' li:first').text() != "Unselect Player") {
+                    dropdown.text($(this).text());
+                    var link1 = document.createElement('a');
+                    link1.appendChild(document.createTextNode('Unselect Player'));
+                    var liEntry1 = document.createElement('li');
+                    liEntry1.appendChild(link1);
+                    $('#' + player_id).prepend(liEntry1);
+
+                    // Add player to array
+                    PLAYERS[team][player] = player_email;
+                }
+                else {
+                    dropdown.text("Choose Player");
+
+                    // remove player from array
+                    PLAYERS[team].splice(player, 1);
+
+                    // Remove unselect from the list.
+                    $('ul#' + player_id + ' li:first').remove();
+                }*/
+                dropdown.append($('<span>', {
+                                        class: "caret"
+                                    }
+                                 ));
+
                 PLAYERS[team][player] = player_email;
-                $(this).closest('.input-group-btn').children('button').text($(this).text());
+
             });
 
             // on a score button click, record the score
@@ -403,7 +447,6 @@
                 }
 
                 SCORES[team][game] = score;
-                console.log(SCORES);
 
 
                 // deactivate last button, active current button.
@@ -475,6 +518,23 @@
                                                 )
                                         );
                 }
+                if (team_1.players.length != team_2.players.length) {
+                    $('#error_message').append($('<div>', {
+                                                class:  "alert alert-danger alert-dismissible",
+                                                role: "alert",
+                                                text:   "Both teams must have the same number of players.",
+                                                id: "err-div"
+                                                })
+                                                .append($('<button>', {
+                                                            type: "button",
+                                                            class: "close"
+                                                        })
+                                                        .attr("data-dismiss", "alert")
+                                                        .attr("aria-label", "Close")
+                                                        .append('<span aria-hidden="true" >&times;</span>')
+                                                )
+                                        );
+                }
                 else if (team_1.scores.length === 0 || team_2.scores.length === 0) {
                     $('#error_message').append($('<div>', {
                                                 class:  "alert alert-danger alert-dismissible",
@@ -530,7 +590,6 @@
                 else {
                     post_json["team_1"] = JSON.stringify(team_1);
                     post_json['team_2'] = JSON.stringify(team_2);
-
                     //post_json = JSON.stringify(post_json);
 
                     $.post("/api/post_match/", post_json, function(data) {
