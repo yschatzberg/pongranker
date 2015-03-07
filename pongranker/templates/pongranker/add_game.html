@@ -277,35 +277,35 @@
            PLAYERS[0] = [];
            PLAYERS[1] = [];
            $.getJSON('/api/player_emails_and_names', { }, function(data) {
-                $.each(data, function(index, element) {
+                $.each(data, function(index, email_name_tuple) {
 
                     // Team 1
                     var link1 = document.createElement('a');
-                    link1.appendChild(document.createTextNode(element));
+                    link1.appendChild(document.createTextNode(email_name_tuple[1]));
                     var liEntry1 = document.createElement('li');
                     liEntry1.appendChild(link1);
                     player_1_list.appendChild(liEntry1);
 
                     var link2 = document.createElement('a');
-                    link2.appendChild(document.createTextNode(element));
+                    link2.appendChild(document.createTextNode(email_name_tuple[1]));
                     var liEntry2 = document.createElement('li');
                     liEntry2.appendChild(link2);
                     player_2_list.appendChild(liEntry2);
 
                     // Team 2
                     var link3 = document.createElement('a');
-                    link3.appendChild(document.createTextNode(element));
+                    link3.appendChild(document.createTextNode(email_name_tuple[1]));
                     var liEntry3 = document.createElement('li');
                     liEntry3.appendChild(link3);
                     player_3_list.appendChild(liEntry3);
 
                     var link4 = document.createElement('a');
-                    link4.appendChild(document.createTextNode(element));
+                    link4.appendChild(document.createTextNode(email_name_tuple[1]));
                     var liEntry4 = document.createElement('li');
                     liEntry4.appendChild(link4);
                     player_4_list.appendChild(liEntry4);
 
-                    emailList[element] = index;
+                    emailList[email_name_tuple[1]] = email_name_tuple[0];
                 });
 
             });

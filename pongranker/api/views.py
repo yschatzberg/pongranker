@@ -15,10 +15,10 @@ from pongranker.api import helper_functions
 def get_player_emails_and_names(request):
     player_list = User.objects.order_by('first_name', 'last_name')
 
-    response = {}
+    response = []
     for player in player_list:
         if not player.is_superuser:
-            response[player.email] = player.first_name + " " + player.last_name
+            response.append(( player.email, player.first_name + " " + player.last_name))
 
     return HttpResponse(json.dumps(response), content_type="application/json")
 
