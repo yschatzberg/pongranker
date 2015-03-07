@@ -47,15 +47,22 @@ class Match(models.Model):
 
 
 class DoublesMatch(models.Model):
+
+    # Team 1's name
+    team_1_name = models.CharField(max_length=100, blank=True, default='')
+
     # first player in team 1, alphabetically.  i.e. arzav jain before yoav schatzberg
     player_1 = models.CharField(max_length=100)
     # second player in team 1
-    player_3 = models.CharField(max_length=100, default='', blank=True)
+    player_3 = models.CharField(max_length=100, default='')
+
+    # Team 2's name
+    team_2_name = models.CharField(max_length=100, blank=True, default='')
 
     # first player in team 2, alphabetically.  i.e. arzav jain before yoav schatzberg
     player_2 = models.CharField(max_length=100)
     # second player in team 1
-    player_4 = models.CharField(max_length=100, default='', blank=True)
+    player_4 = models.CharField(max_length=100, default='')
 
     # Number of points added or subtracted from team 1's ELO
     team_1_point_change = models.IntegerField(default=0)

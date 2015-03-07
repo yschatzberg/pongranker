@@ -74,3 +74,17 @@ def get_team_by_players(player_1, player_2):
             return team
     # Otherwise return False
     return False
+
+
+# Returns either the team name or first name of each player separated by "and"
+def get_team_short_name(player_1, player_2):
+    first_names = []
+    for player in [player_1, player_2]:
+        try:
+            first_names.append(player.split()[0])
+        except:
+            raise ValueError(player_1 + " " + player_2)
+
+    name = " and ".join(first_names)
+
+    return name

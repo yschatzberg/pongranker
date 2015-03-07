@@ -68,7 +68,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
-                    <h3 class="panel-title text-center">Singles Rankings</h3>
+                    <h3 class="panel-title text-center">Doubles Rankings</h3>
                   </div>
                       <div class="panel-body">
                         <ul class="list-group" id="playerList">
@@ -118,7 +118,7 @@
                                   {{ player.user.first_name }} {{ player.user.last_name }}
                               </li>
             */
-           $.getJSON('/api/players_ranked', {}, function(data) {
+           $.getJSON('/api/teams_ranked', {}, function(data) {
                 $.each(data, function(index, element) {
                     span = $('<span>').addClass("badge").text(element['ranking']);
                     player_entry = $('<li>')
@@ -184,7 +184,7 @@
                     </div>
                 </li>
             */
-           $.getJSON('../api/singles_matches', {max_matches:5}, function(data) {
+           $.getJSON('../api/doubles_matches', {max_matches:5}, function(data) {
                 $.each(data, function(index, element) {
                     match_date = new Date(element['timestamp'] * 1000);
                     var date_span = document.createElement('span');
@@ -197,7 +197,7 @@
 
 
                     // Add Player 1
-                    row_div.appendChild(buildSinglePlayerHeader(element['player_1'], element['p1_wins'], element['p1_wins'] > element['p2_wins']));
+                    row_div.appendChild(buildSinglePlayerHeader(element['team_1'], element['team_1_wins'], element['team_1_wins'] > element['team_2_wins']));
 
                     //add vs.
                     var vs_div = document.createElement('div');
@@ -207,7 +207,7 @@
 
 
                     // Add player 2
-                    row_div.appendChild(buildSinglePlayerHeader(element['player_2'], element['p2_wins'], element['p2_wins'] > element['p1_wins']));
+                    row_div.appendChild(buildSinglePlayerHeader(element['team_2'], element['team_2_wins'], element['team_2_wins'] > element['team_1_wins']));
 
                     var header = document.createElement('div');
                     header.className = "header";

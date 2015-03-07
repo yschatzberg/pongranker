@@ -13,11 +13,13 @@ from django.contrib.auth.models import User
 import json
 
 def home(request):
-    player_list = Player.objects.order_by('-elo_singles_ranking','-total_singles_wins')
     template = loader.get_template('pongranker/index.html')
-    context = RequestContext(request, {
-        'player_list': player_list,
-    })
+    context = RequestContext(request)
+    return HttpResponse(template.render(context))
+
+def doubles(request):
+    template = loader.get_template('pongranker/doubles.html')
+    context = RequestContext(request)
     return HttpResponse(template.render(context))
 
 def players(request):

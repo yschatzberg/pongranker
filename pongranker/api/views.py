@@ -6,7 +6,7 @@ import json
 import time
 from elo import rate_1vs1
 
-from pongranker.models import Player, Match, MatchGame, DoublesMatch
+from pongranker.models import Player, Match, MatchGame, DoublesMatch, DoublesTeam
 from django.contrib.auth.models import User
 from pongranker.api import helper_functions
 
@@ -24,7 +24,7 @@ def get_player_emails_and_names(request):
 
 
 # TODO: change this to get_singles_matches and implement get_doubles_matches once DoublesMatch exists.
-def get_matches(request):
+def get_singles_matches(request):
 
     response = []
 
@@ -42,6 +42,50 @@ def get_matches(request):
             match_json[u'p2_point_change'] = match.team_2_point_change
             match_json[u'p1_wins'] = match.team_1_wins
             match_json[u'p2_wins'] = match.team_2_wins
+            match_json[u'timestamp'] = match.timestamp
+
+            games_json = []
+
+            for game in match.games.all():
+                game_json = {}
+                game_json[u'score_1'] = game.score_1
+                game_json[u'score_2'] = game.score_2
+
+                games_json.append(game_json)
+
+            match_json[u'games'] = games_json
+
+            response.append(match_json)
+
+    return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+def get_doubles_matches(request):
+
+    response = []
+
+    if request.method == 'GET':
+        match_list = DoublesMatch.objects.order_by("-timestamp")
+
+        max_matches = request.GET.get('max_matches', len(match_list))
+        max_matches = int(max_matches)
+
+        for match in match_list[:max_matches]:
+            match_json = {}
+            team_1_name = match.team_1_name
+            if not team_1_name:
+                team_1_name = helper_functions.get_team_short_name(match.player_1, match.player_3)
+            match_json[u'team_1'] = team_1_name
+
+            team_2_name = match.team_2_name
+            if not team_2_name:
+                team_2_name = helper_functions.get_team_short_name(match.player_2, match.player_4)
+            match_json[u'team_2'] = team_2_name
+
+            match_json[u'team_1_point_change'] = match.team_1_point_change
+            match_json[u'team_2_point_change'] = match.team_2_point_change
+            match_json[u'team_1_wins'] = match.team_1_wins
+            match_json[u'team_2_wins'] = match.team_2_wins
             match_json[u'timestamp'] = match.timestamp
 
             games_json = []
@@ -99,6 +143,12 @@ def post_match(request):
                 match.player_3 = team_1_player_list[1].user.first_name + " " + team_1_player_list[1].user.last_name
             if len(team_2_player_list) == 2:
                 match.player_4 = team_2_player_list[1].user.first_name + " " + team_2_player_list[1].user.last_name
+
+            # Add team names if they exist
+            if team_1.team_name:
+                match.team_1_name = team_1.team_name
+            if team_2.team_name:
+                match.team_2_name = team_2.team_name
         else:
             # Create Match object
             match = Match(
@@ -184,7 +234,7 @@ def get_players_ranked(request):
 
         response_json = []
         for player in player_list[:max_matches]:
-            if (player.total_wins + player.total_losses) > 1:
+            if (player.total_wins + player.total_losses) > 0:
                 player_json = {}
                 player_json['name'] = player.user.first_name + " " + player.user.last_name
                 player_json['ranking'] = player.elo_ranking
@@ -192,6 +242,40 @@ def get_players_ranked(request):
                 player_json['losses'] = player.total_losses
 
                 response_json.append(player_json)
+
+        return HttpResponse(json.dumps(response_json), content_type="application/json")
+    else:
+        return HttpResponse(
+            json.dumps({"error": 10, "message": "Must use GET request to access this site."}),
+            content_type="application/json"
+        )
+
+def get_teams_ranked(request):
+
+    if request.method == 'GET':
+        response_json = {}
+        team_list = DoublesTeam.objects.order_by('-elo_ranking','-total_wins')
+        max_matches = request.GET.get('max_results', len(team_list))
+        max_matches = int(max_matches)
+
+        response_json = []
+        for team in team_list[:max_matches]:
+            if (team.total_wins + team.total_losses) > 0:
+                team_json = {}
+                name = team.team_name
+                if not name:
+                    player_name_list = []
+                    for player in team.players.all():
+                        player_name_list.append(player.user.first_name)
+
+                    name = " and ".join(player_name_list)
+
+                team_json['name'] = name
+                team_json['ranking'] = team.elo_ranking
+                team_json['wins'] = team.total_wins
+                team_json['losses'] = team.total_losses
+
+                response_json.append(team_json)
 
         return HttpResponse(json.dumps(response_json), content_type="application/json")
     else:

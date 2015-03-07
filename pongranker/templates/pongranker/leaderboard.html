@@ -28,6 +28,8 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul class="nav navbar-nav">
+                <li><a href="/singles/">Singles</a></li>
+                <li><a href="/doubles/">Doubles</a></li>
                 <li><a href="/leaderboard/">Leaderboard</a></li>
                 <li><a href="/players">Players</a></li>
               </ul>
@@ -58,13 +60,25 @@
 
         <!-- Player Rankings Panel -->
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2">
+            <div class="col-lg-6">
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <h3 class="panel-title text-center">Singles Top 3</h3>
                   </div>
                       <div class="panel-body">
                         <ul class="list-group" id="playerList">
+
+                        </ul>
+                      </div>
+                </div>
+            </div>
+             <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title text-center">Doubles Top 3</h3>
+                  </div>
+                      <div class="panel-body">
+                        <ul class="list-group" id="teamList">
 
                         </ul>
                       </div>
@@ -102,6 +116,21 @@
                                 );
                     player_entry.append(span);
                     $("#playerList").append(player_entry);
+
+                });
+           });
+           $.getJSON('/api/teams_ranked', {max_results: 3}, function(data) {
+                $.each(data, function(index, element) {
+                    span = $('<span>').addClass("badge").text(element['ranking']);
+                    team_entry = $('<li>')
+                                .addClass("list-group-item")
+                                .text("Wins: " + element['wins'] + " Losses: " + element['losses'])
+                                .append($('<div>')
+                                            .addClass("col-lg-5")
+                                            .text((index+1) + ". " + element['name'])
+                                );
+                    team_entry.append(span);
+                    $("#teamList").append(team_entry);
 
                 });
            });
